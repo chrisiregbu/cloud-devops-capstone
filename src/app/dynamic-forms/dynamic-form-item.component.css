@@ -1,0 +1,13 @@
+.form-row {
+    margin-bottom: 10px;
+}
+
+label {
+    float: left;
+    width: 150px;
+}
+
+input, select {
+    width: 200px;
+    box-sizing: border-box;
+}
