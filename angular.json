@@ -93,7 +93,7 @@
           }
         },
         "lint": {
-          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "builder": "@angular-devkit/build-angular:karma",
           "options": {
             "tsConfig": [
               "tsconfig.app.json",
