@@ -129,20 +129,6 @@ export class DynamicFormsComponent {
   constructor() {
 
       let items: FormItemBase<any>[] = [
-    
-          // new DropdownFormItem({
-          //     key: 'nationality',
-          //     label: 'Nationality',
-          //     options: [
-          //         {key: 'NO', value: 'Norway'},
-          //         {key: 'SE', value: 'Sweden'},
-          //         {key: 'DK', value: 'Denmark'},
-          //         {key: 'FI', value: 'Finland'},
-          //         {key: 'XX', value: 'Other'}
-          //     ],
-          //     order: 5
-          // }),
-
           new TextboxFormItem({
               key: 'firstName',
               label: 'Customer number',
@@ -150,30 +136,6 @@ export class DynamicFormsComponent {
               required: true,
               order: 1
           }),
-
-          // new TextboxFormItem({
-          //     key: 'lastName',
-          //     label: 'Last name',
-          //     value: 'Nordmann',
-          //     required: true,
-          //     order: 2
-          // }),
-
-          // new TextboxFormItem({
-          //     key: 'salary',
-          //     label: 'Salary',
-          //     type: 'number',
-          //     value: '25000',
-          //     required: true,
-          //     order: 3
-          // }),
-
-          // new TextboxFormItem({
-          //     key: 'emailAddress',
-          //     label: 'Email',
-          //     type: 'email',
-          //     order: 4
-          // })
       ];
 
       this.formItems = items.sort((a, b) => a.order - b.order);
