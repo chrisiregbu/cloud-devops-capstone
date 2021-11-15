@@ -52,6 +52,8 @@ jobs:
               command: 
                 npm install
                 npm install --save-dev @angular-devkit/build-angular
+                npm audit fix --audit-level=critical --force
+                npm audit fix --audit-level=critical
           # Cache local dependencies in CircleCI storage if they don't exist
           # In this case, install the npm dependencies only once and then cache the node_modules folder 
           # using a hash of the package.json file as the cache key
