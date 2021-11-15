@@ -64,7 +64,7 @@ jobs:
           # Lint the source code
           - run:
               name: Linting
-              command: npm run lint
+              command: npm run script
           # Test the source code
           - run:
               name: Testing
