@@ -85,9 +85,9 @@ jobs:
           # notify_on_fail_with_template. Taken from Circleci Developer page  - https://circleci.com/developer/orbs/orb/circleci/slack
           # In the event the front-end build has failed, alert UdaPeople
           - slack/notify:
-            template: basic_fail_1
-            custom: | 
-              {
+              template: basic_fail_1
+              custom: | 
+                {
                   "text": "",
                   "blocks": [
                       {
@@ -98,7 +98,7 @@ jobs:
                           }
                       }
                   ]
-              }  
+                }  
             event: fail
 
     # The deploy job
