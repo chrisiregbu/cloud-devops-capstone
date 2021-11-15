@@ -33,7 +33,7 @@ jobs:
       # The current directory will be the place where all the steps will run
       working_directory: ~/project
       docker:
-          - image: circleci/node:6.10-browsers
+          - image: circleci/node:16.13.0
       steps:
           # Checkout the code from the git branch into the working_directory
           - checkout
