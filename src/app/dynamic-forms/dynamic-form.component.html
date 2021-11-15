@@ -5,12 +5,12 @@
             <dynamic-form-item [formItem]="formItem" [form]="form"></dynamic-form-item>
         </div>
         <div>
-            <button type="submit" [disabled]="!form.valid">Save</button>
+            <button type="submit" [disabled]="!form.valid">Continue</button>
         </div>
     </form>
 
-    <div *ngIf="payLoad" class="form-summary">
+    <!-- <div *ngIf="payLoad" class="form-summary">
         Saved the following values: {{payLoad}}
-    </div>
+    </div> -->
 
 </div>

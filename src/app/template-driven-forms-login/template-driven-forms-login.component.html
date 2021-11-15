@@ -15,7 +15,23 @@
   
 <form #f="ngForm" (ngSubmit)="onSubmit(f)">
 
-    <p>
+    <h2>How can we help you save?</h2>
+
+    <h2>Our go-to account for building your savings habit</h2>
+
+	<h3>Digital Regular Saver</h3>
+
+    <ul>
+        <li>Earn our highest interest rate when you save between £1-£50 each month</li>
+		<li>Get into a regular savings habit</li>
+        <li>Instantly access your money whenever you need to</li>
+        <li>Apply online only in just 5 minutes</li>
+	</ul>
+
+    <h2>Digital Regular Saver</h2>
+
+    <p>3% Gross / 3.04% AER p.a. (variable) on balances up to £1,000</p>
+    <!-- <p>
         <label>Description</label>
         <input type="text" [(ngModel)]="model.description" name="description" #description="ngModel" required>
         <span [hidden]="description.valid || description.pristine" class="error">Description is required</span>
@@ -34,10 +50,30 @@
             <option *ngFor="let c of categoriesAsObjects" [ngValue]="c">{{c.name}}</option>
         </select>
         <span [hidden]="categoryAsObject.valid || categoryAsObject.pristine" class="error">Category (as object) is required</span>
+    </p> -->
+    <!-- <p>
+        <label>Description</label>
+        <input type="text" [(ngModel)]="model.description" name="description" #description="ngModel" required>
+        <span [hidden]="description.valid || description.pristine" class="error">Description is required</span>
     </p>
+
+    <p>
+        <label>Category</label>
+        <select [(ngModel)]="model.category" name="category" #category="ngModel" required>
+            <option *ngFor="let c of categories" [ngValue]="c">{{c}}</option>
+        </select>
+        <span [hidden]="category.valid || category.pristine" class="error">Category is required</span>
+
+    <p>
+        <label>Category (as object)</label>
+        <select [compareWith]="categoryById" [(ngModel)]="model.categoryAsObject" name="categoryAsObject" #categoryAsObject="ngModel" required>
+            <option *ngFor="let c of categoriesAsObjects" [ngValue]="c">{{c.name}}</option>
+        </select>
+        <span [hidden]="categoryAsObject.valid || categoryAsObject.pristine" class="error">Category (as object) is required</span>
+    </p> -->
     
     <!-- Demonstrate using the "email" validation directive -->
-    <p>
+    <!-- <p>
         <label>Supplier email</label>
         <input type="email" [(ngModel)]="model.supplierEmail" name="supplierEmail" #supplierEmail="ngModel" required email>
         <span [hidden]="!supplierEmail.hasError('required') || supplierEmail.pristine"  class="error">Supplier email is required</span>
@@ -48,25 +84,25 @@
         <label>Price</label>
         <input type="number" [(ngModel)]="model.price" name="price" #price="ngModel" required>
         <span [hidden]="price.valid || price.pristine" class="error">Price is required</span>
-    </p>
+    </p> -->
 
-    <p>
+    <!-- <p> -->
         <!-- Demonstrate using the "minlength" and "maxlength" validation directives -->
-        <label>Additional info</label>
+        <!-- <label>Additional info</label>
         <input type="text" [(ngModel)]="model.additionalInfo" name="additionalInfo" #additionalInfo="ngModel" minlength="10" maxlength="25" required>
         <span [hidden]="!additionalInfo.hasError('minlength') || additionalInfo.untouched" class="error">Min length 10 characters</span>
         <span [hidden]="!additionalInfo.hasError('maxlength') || additionalInfo.untouched" class="error">Max length 25 characters</span>
-    </p>
+    </p> -->
 
-    <p>
+    <!-- <p>
         <button type="submit" [disabled]="!f.valid">Submit</button>
-    </p>
+    </p> -->
 
 </form>
 
-<div [hidden]="products.length == 0">
+<!-- <div [hidden]="products.length == 0">
     <h3>Products added so far</h3>
     <ul>
         <li *ngFor="let p of products">{{p | json}}</li>
     </ul>
-</div>
+</div> -->
