@@ -94,6 +94,17 @@ jobs:
           command: 
             sudo npm install -g karma-cli
             npm run test
+      # Build project with different configuration based on the current branch
+      - run:
+          name: Branch build 
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "staging" ]; then
+              npm run build-qa
+            elif [ "${CIRCLE_BRANCH}" == "main" ]; then
+                npm run production
+            else
+                npm run dev
+            fi
       # Cache the dist folder for the deploy job
       - save_cache:
           key: v1-dist-{{ .Environment.CIRCLE_BRANCH }}-{{ .Environment.CIRCLE_SHA1 }}
