@@ -33,7 +33,7 @@ jobs:
       # The current directory will be the place where all the steps will run
       working_directory: ~/project
       docker:
-          - image: circleci/node:10-browsers
+          - image: circleci/node:16.13.0
       steps:
           # Checkout the code from the git branch into the working_directory
           - checkout
@@ -68,10 +68,7 @@ jobs:
           # Test the source code
           - run:
               name: Test source code
-              command: 
-                npm run test -- --no-watch --no-progress --browsers=ChromeHeadlessCI
-                npm audit fix --audit-level=critical --force
-                npm audit fix --audit-level=critical
+              command: npm run test -- --no-watch --no-progress --browsers=ChromeHeadlessCI
           # Build project with different configuration based on the current branch
           - run:
               name: Build project
@@ -85,7 +82,7 @@ jobs:
                   fi
           # End to End test
           - run:
-              name: Run e2e test
+              name: Run End-to-End test
               command: npm run e2e -- --protractor-config=e2e/protractor-ci.conf.js
 
           # Cache the dist folder for the deploy job
