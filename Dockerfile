@@ -28,9 +28,9 @@ RUN  npm run build --prod
 FROM nginx:1.19.4-alpine
 
 # Update nginx conf
-RUN rm -rf /etc/nginx/conf.d
+#RUN rm -rf /etc/nginx/conf.d
 
-COPY conf /etc/nginx
+#COPY conf /etc/nginx
 
 # Copy/deploy the application (static) files to the Nginx server at /usr/share/Nginx/HTML location
 COPY --from=build-step /app/dist/DemoApp /usr/share/nginx/html
