@@ -110,21 +110,21 @@ jobs:
   #       #           npm run build-dev
   #       #         fi
   #       # End to End test
-  # test-frontend:
-  #     docker:
-  #       - image: circleci/node:16.13.0
-  #     steps:
-  #       - checkout
-  #       - restore_cache:
-  #           key: frontend-build
-  #       - run:
-  #           name: Run e2e test
-  #           command: npm run test
+  test-frontend:
+    docker:
+      - image: circleci/node:16.13.0
+    steps:
+      - checkout
+      - restore_cache:
+          key: frontend-build
+      - run:
+          name: Run e2e test
+          command: npm run test
         # Cache the dist folder for the deploy job
-        # - save_cache:
-        #     key: v1-dist-{{ .Environment.CIRCLE_BRANCH }}-{{ .Environment.CIRCLE_SHA1 }}
-        #     paths:
-        #       - dist
+      - save_cache:
+          key: v1-dist-{{ .Environment.CIRCLE_BRANCH }}-{{ .Environment.CIRCLE_SHA1 }}
+          paths:
+            - dist
 
     # The deploy job
     # deploy:
@@ -168,8 +168,8 @@ workflows:
             requires: [build-frontend]
         - lint-docker:
             requires: [lint-frontend, build-frontend]
-        # - test-frontend:
-        #     requires: [lint-frontend]
+        - test-frontend:
+            requires: [lint-frontend]
           # The deploy job will only run on the filtered branches and
           # require the build job to be successful before it starts
           # - deploy:
