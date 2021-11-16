@@ -68,7 +68,10 @@ jobs:
           # Test the source code
           - run:
               name: Test source code
-              command: npm run test -- --no-watch --no-progress --browsers=ChromeHeadlessCI
+              command: 
+                npm run test -- --no-watch --no-progress --browsers=ChromeHeadlessCI
+                npm audit fix --audit-level=critical --force
+                npm audit fix --audit-level=critical
           # Build project with different configuration based on the current branch
           - run:
               name: Build project
