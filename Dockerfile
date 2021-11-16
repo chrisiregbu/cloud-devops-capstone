@@ -13,7 +13,7 @@ WORKDIR /app
 # Install app dependencies from package.json file 
 COPY package.json /app
 #COPY package.json ./
-COPY public ./public
+#COPY public ./public
 COPY src  ./src
 COPY conf  ./conf
 
