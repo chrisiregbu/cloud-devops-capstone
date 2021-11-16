@@ -119,10 +119,10 @@ jobs:
           name: Build docker container
           command: |
             docker login --username ${DOCKER_USER} --password ${DOCKER_SECRET}
-            docker build -t cicapstone/angular-app:latest . 
+            docker build -t cicloud-app:latest . 
             docker images ls
-            docker tag cicapstone/angular-app ${DOCKER_USR}/cicapstone/angular-app:latest
-            docker push ${DOCKER_USR}/cicapstone/angular-app:latest
+            docker tag cicloud-app ${DOCKER_USR}/cicloud-app:latest
+            docker push ${DOCKER_USR}/cicloud-app:latest
 
   # The deploy job
   deploy:

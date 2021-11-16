@@ -24,21 +24,13 @@ COPY . /app
 # Create production build using Node image
 RUN  npm run build --prod
 
-#RUN npm config set legacy-peer-deps true
-
 # Step 2 - NGINX server
 
 # Base image - use the Ngix server image to create the Nginx server
 FROM nginx:1.19.4-alpine
 
-# Update nginx conf
-#RUN rm -rf /etc/nginx/conf.d
-
-#COPY conf /etc/nginx
-
 # Copy/deploy the application (static) files to the Nginx server at /usr/share/Nginx/HTML location
 COPY --from=build-step /app/dist/DemoApp /usr/share/nginx/html
-#COPY --from=builder /usr/src/app/build /usr/share/nginx/html
 
 # expose port
 EXPOSE 80
