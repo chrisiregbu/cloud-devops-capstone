@@ -110,6 +110,19 @@ jobs:
           key: v1-dist-{{ .Environment.CIRCLE_BRANCH }}-{{ .Environment.CIRCLE_SHA1 }}
           paths:
             - dist
+  
+  build-container: # https://dzone.com/articles/how-to-dockerize-angular-app
+    machine: true
+    steps:
+      - checkout
+      - run:
+          name: Build docker container
+          command: |
+            docker login --username ${DOCKER_USER} --password ${DOCKER_SECRET}
+            docker build -t cicapstone/angular-app:latest . 
+            docker images ls
+            docker tag cicapstone/angular-app ${DOCKER_USR}/cicapstone/angular-app:latest
+            docker push ${DOCKER_USR}/cicapstone/angular-app:latest
 
   # The deploy job
   deploy:
@@ -159,16 +172,19 @@ workflows:
             requires: [lint-frontend, build-frontend]
         - test-frontend:
             requires: [lint-frontend]
+        - build-container:
+            requires: [test-frontend, lint-frontend, lint-docker]
+            filters:
+              branches:
+                only: [main]
         - deploy:
-            requires: [test-frontend]
+            requires: [build-container]
           # The deploy job will only run on the filtered branches and
           # require the build job to be successful before it starts
-          # - deploy:
-          #     requires:
-          #         - build
-          #     filters:
-          #         branches:
-          #             only:
-          #               - develop
-          #               - staging
-          #               - master
+            filters:
+              branches:
+                only:
+                  - develop
+                  - staging
+                  - main
+                  - master
