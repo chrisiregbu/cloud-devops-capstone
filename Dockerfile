@@ -15,12 +15,16 @@ COPY package.json /app
 
 COPY src  ./src
 
+RUN npm cache clean –force
+
 RUN npm install 
 
 COPY . /app
 
 # Create production build using Node image
 RUN  npm run build --prod
+
+#RUN npm config set legacy-peer-deps true
 
 # Step 2 - NGINX server
 
