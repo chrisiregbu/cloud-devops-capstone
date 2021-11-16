@@ -54,9 +54,9 @@ jobs:
         - run:
             name: Install dependencies
             command: |
+              sudo apt-get install python3-venv
               python3 -m venv venv
               . venv/bin/activate
-              apt-get install python3-venv
               sudo make install
         
         # run tests!
