@@ -115,39 +115,40 @@ jobs:
     deploy:
         working_directory: ~/project
         docker:
-            - image: circleci/node:6.10-browsers
+            - image: circleci/node:16.13.0
         steps:
-            # Log the current branch
-            - run:
-                name: Show current branch
-                command: echo ${CIRCLE_BRANCH}
-            # Restore cache from the build job which contains the dist folder that needs to be deployed
-            - restore_cache:
-                key: v1-dist-{{ .Environment.CIRCLE_BRANCH }}-{{ .Environment.CIRCLE_SHA1 }}
-            # Install AWS cli
-            - run:
-                name: Install aws cli
-                command:
-                    sudo apt-get -y -qq install awscli
-            # Set the signature version for the S3 auth
-            - run:
-                name: Setting Signature Version 4 for S3 Request Authentication
-                command: aws configure set default.s3.signature_version s3v4
-            # Deploy to the S3 bucket corresponding to the current branch
-            - run:
-                name: Deploy to S3
-                command: |
-                    if [ "${CIRCLE_BRANCH}" == "develop" ]; then
-                        aws --region ${AWS_DEFAULT_REGION} s3 sync dist s3://dev-${AWS_ACCOUNT}-bucket/ --delete
-                    elif [ "${CIRCLE_BRANCH}" == "staging" ]; then
-                        aws --region ${AWS_DEFAULT_REGION} s3 sync dist s3://qa-${AWS_ACCOUNT}-bucket/ --delete
-                    elif [ "${CIRCLE_BRANCH}" == "main" ]; then
-                        aws --region ${AWS_DEFAULT_REGION} s3 sync dist s3://prod-${AWS_ACCOUNT}-bucket/ --delete
-                    elif [ "${CIRCLE_BRANCH}" == "master" ]; then
-                        aws --region ${AWS_DEFAULT_REGION} s3 sync dist s3://prod-${AWS_ACCOUNT}-bucket/ --delete
-                    fi
-                    #aws s3 cp s3://udacity-demo-1/udacity.zip .
-                    #unzip -o udacity.zip
+          - checkout
+          - restore_cache:
+              key: frontend-build
+          # Log the current branch
+          - run:
+              name: Show current branch
+              command: echo ${CIRCLE_BRANCH}
+          # Restore cache from the build job which contains the dist folder that needs to be deployed
+          - restore_cache:
+              key: v1-dist-{{ .Environment.CIRCLE_BRANCH }}-{{ .Environment.CIRCLE_SHA1 }}
+          # Install AWS cli
+          - run:
+              name: Install aws cli
+              command:
+                  sudo apt-get -y -qq install awscli
+          # Set the signature version for the S3 auth
+          - run:
+              name: Setting Signature Version 4 for S3 Request Authentication
+              command: aws configure set default.s3.signature_version s3v4
+          # Deploy to the S3 bucket corresponding to the current branch
+          - run:
+              name: Deploy to S3
+              command: |
+                  if [ "${CIRCLE_BRANCH}" == "develop" ]; then
+                      aws --region ${AWS_DEFAULT_REGION} s3 sync dist s3://dev-${AWS_ACCOUNT}-bucket/ --delete
+                  elif [ "${CIRCLE_BRANCH}" == "staging" ]; then
+                      aws --region ${AWS_DEFAULT_REGION} s3 sync dist s3://qa-${AWS_ACCOUNT}-bucket/ --delete
+                  elif [ "${CIRCLE_BRANCH}" == "main" ]; then
+                      aws --region ${AWS_DEFAULT_REGION} s3 sync dist s3://prod-${AWS_ACCOUNT}-bucket/ --delete
+                  elif [ "${CIRCLE_BRANCH}" == "master" ]; then
+                      aws --region ${AWS_DEFAULT_REGION} s3 sync dist s3://prod-${AWS_ACCOUNT}-bucket/ --delete
+                  fi
 workflows:
     default:
       jobs:
@@ -158,6 +159,8 @@ workflows:
             requires: [lint-frontend, build-frontend]
         - test-frontend:
             requires: [lint-frontend]
+        - deploy:
+            requires: [test-frontend]
           # The deploy job will only run on the filtered branches and
           # require the build job to be successful before it starts
           # - deploy:
