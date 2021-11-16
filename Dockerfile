@@ -4,7 +4,7 @@ RUN apk add chromium
 RUN apk add --no-cache \
     git=2.8.6-r0 \
     bash=4.3.42-r6 \
-    python3=3.5.1-r0
+    python3=3.9.8-r0
 
 ENV CHROME_BIN='/usr/bin/chromium-browser'
 
