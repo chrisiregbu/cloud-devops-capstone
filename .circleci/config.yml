@@ -42,7 +42,6 @@ jobs:
         - run:
             name: Install local dependencies
             command: 
-              #npm install
               npm update
               ng update
               ng update--all--force
@@ -52,7 +51,7 @@ jobs:
                 sudo npm i
                 npm run build
 
-  # # Lint the source code
+  # Lint the source code
   lint-frontend:
       docker:
         - image: circleci/node:16.13.0
@@ -61,34 +60,31 @@ jobs:
         - restore_cache:
             key: frontend-build
         - run:
+            name: Install project specific dependencies
+            command:  npm ci
+        - run:
             name: Lint frontend
-            command: 
-              npm ci
-              npm run lint
-        # Test the source code
-        # - run:
-        #     name: Test source code
-        #     command: npm run test
+            command: npm run lint
 
-  # lint-docker:
-  #     docker: 
-  #       - image: python:3.7.3-stretch
-  #     steps:
-  #       - checkout
-  #       - restore_cache:
-  #           key: frontend-build
-  #       - run:
-          # name: Install dependencies
-            #command: |
-              #sudo apt-get install python3-venv
-              #python3 -m venv venv
-              #. venv/bin/activate
-  #       - run:
-  #           name: Lint docker
-  #           command: |
-  #             wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 &&\
-  #             chmod +x /bin/hadolint
-  #             hadolint Dockerfile
+  lint-docker:
+      docker: 
+        - image: python:3.7.3-stretch
+      steps:
+        - checkout
+        - restore_cache:
+            key: frontend-build
+        - run:
+            name: Install dependencies
+            command: |
+              sudo apt-get install python3-venv
+              python3 -m venv venv
+              . venv/bin/activate
+        - run:
+            name: Lint docker
+            command: |
+              wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 &&\
+              chmod +x /bin/hadolint
+              hadolint Dockerfile
 
   # # Lint the source code
   # lint-frontend:
@@ -174,10 +170,8 @@ workflows:
         - build-frontend
         - lint-frontend:
             requires: [build-frontend]
-        # - lint-docker:
-        #     requires: [build-frontend]
-        # - lint-frontend:
-        #     requires: [lint-docker]
+        - lint-docker:
+            requires: [lint-frontend, build-frontend]
         # - test-frontend:
         #     requires: [lint-frontend]
           # The deploy job will only run on the filtered branches and
