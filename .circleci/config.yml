@@ -6,11 +6,13 @@ orbs:
   aws-eks: circleci/aws-eks@0.2.3
 
 jobs:
-  build-frontend:
-    # The current directory will be the place where all the steps will run
-    working_directory: ~/project
+  build:
     docker:
         - image: circleci/node:16.13.0
+    
+    # The current directory will be the place where all the steps will run
+    working_directory: ~/project
+
     steps:
         # Checkout the code from the git branch into the working_directory
         - checkout
@@ -22,6 +24,7 @@ jobs:
         - restore_cache:
             keys:
             - v1-dependencies-{{ checksum "package.json" }}
+            # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
         # Install project dependencies
         - run:
@@ -48,76 +51,79 @@ jobs:
             command: |
                 sudo npm i
                 npm run build
-  
-        # Build project with different configuration based on the current branch
-        # - run:
-        #     name: Configure build
-        #     command: |
-        #       if [ "${CIRCLE_BRANCH}" == "staging" ]; then
-        #             npm run test
-        #         elif [ "${CIRCLE_BRANCH}" == "master" ]; then
-        #             npm run production
-        #         else
-        #             npm run dev
-        #         fi
-        # # Cache the dist folder for the deploy job
-        # - save_cache:
-        #       key: v1-dist-{{ .Environment.CIRCLE_BRANCH }}-{{ .Environment.CIRCLE_SHA1 }}
-        #       paths:
-        #         - dist
-
-  lint-docker:
-      docker: 
-        - image: python:3.7.3-stretch
-      steps:
-        - checkout
-        - restore_cache:
-            key: frontend-build
         - run:
             name: Install dependencies
             command: |
               python3 -m venv venv
-              .venv/bin/activate
-              hadolint ./Dockerfile
-
-  # Lint the source code
-  lint-frontend:
-      docker:
-        - image: circleci/node:16.13.0
-      steps:
-        - checkout
-        - restore_cache:
-            key: frontend-build
+              . venv/bin/activate
+              sudo make install
+        
+        # run tests!
         - run:
-            name: Lint frontend
-            command: npm run lint
-        # Test the source code
-        # - run:
-        #     name: Test source code
-        #     command: npm run test
-
-        # Build project with different configuration based on the current branch
-        # - run:
-        #     name: Build project
-        #     command: |
-        #         if [ "${CIRCLE_BRANCH}" == "staging" ]; then
-        #           npm run build-qa
-        #         elif [ "${CIRCLE_BRANCH}" == "master" ]; then
-        #           npm run build-prod
-        #         else
-        #           npm run build-dev
-        #         fi
-        # End to End test
-  test-frontend:
-      docker:
-        - image: circleci/node:16.13.0
-      steps:
-        - checkout
-        - restore_cache:
-            key: frontend-build
+            name: run tests
+            command: |
+              . venv/bin/activate
+              make test
+        
+        # run lints!
         - run:
-            name: Run End-to-End test
-            command: npm run test
+            name: run lint
+            command: |
+              . venv/bin/activate
+              make lint
+
+  # lint-docker:
+  #     docker: 
+  #       - image: python:3.7.3-stretch
+  #     steps:
+  #       - checkout
+  #       - restore_cache:
+  #           key: frontend-build
+  #       - run:
+  #           name: Lint docker
+  #           command: |
+  #             wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 &&\
+  #             chmod +x /bin/hadolint
+  #             hadolint Dockerfile
+
+  # # Lint the source code
+  # lint-frontend:
+  #     docker:
+  #       - image: circleci/node:16.13.0
+  #     steps:
+  #       - checkout
+  #       - restore_cache:
+  #           key: frontend-build
+  #       - run:
+  #           name: Lint frontend
+  #           command: npm run lint
+  #       # Test the source code
+  #       # - run:
+  #       #     name: Test source code
+  #       #     command: npm run test
+
+  #       # Build project with different configuration based on the current branch
+  #       # - run:
+  #       #     name: Build project
+  #       #     command: |
+  #       #         if [ "${CIRCLE_BRANCH}" == "staging" ]; then
+  #       #           npm run build-qa
+  #       #         elif [ "${CIRCLE_BRANCH}" == "master" ]; then
+  #       #           npm run build-prod
+  #       #         else
+  #       #           npm run build-dev
+  #       #         fi
+  #       # End to End test
+  # test-frontend:
+  #     docker:
+  #       - image: circleci/node:16.13.0
+  #     steps:
+  #       - checkout
+  #       - restore_cache:
+  #           key: frontend-build
+  #       - run:
+  #           name: Run e2e test
+  #           command: npm run test
         # Cache the dist folder for the deploy job
         # - save_cache:
         #     key: v1-dist-{{ .Environment.CIRCLE_BRANCH }}-{{ .Environment.CIRCLE_SHA1 }}
@@ -162,12 +168,13 @@ workflows:
     default:
       jobs:
         - build-frontend
-        - lint-frontend:
-            requires: [build-frontend]
+        - setup-env
         - lint-docker:
             requires: [build-frontend]
+        - lint-frontend:
+            requires: [lint-docker]
         - test-frontend:
-            requires: [build-frontend]
+            requires: [lint-frontend]
           # The deploy job will only run on the filtered branches and
           # require the build job to be successful before it starts
           # - deploy:
