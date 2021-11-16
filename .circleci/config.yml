@@ -6,7 +6,7 @@ orbs:
   aws-eks: circleci/aws-eks@0.2.3
 
 jobs:
-  build:
+  build-app:
     docker:
         - image: circleci/node:16.13.0
     
@@ -57,14 +57,22 @@ jobs:
               sudo apt-get install python3-venv
               python3 -m venv venv
               . venv/bin/activate
-              #sudo make install
-              
-        # run lints!
+
+  # # Lint the source code
+  lint-app:
+      docker:
+        - image: circleci/node:16.13.0
+      steps:
+        - checkout
+        - restore_cache:
+            key: frontend-build
         - run:
-            name: run lint
-            command: |
-              . venv/bin/activate
-              make lint
+            name: Lint frontend app
+            command: npm run lint
+        # Test the source code
+        # - run:
+        #     name: Test source code
+        #     command: npm run test
 
   # lint-docker:
   #     docker: 
@@ -161,7 +169,9 @@ jobs:
 workflows:
     default:
       jobs:
-        - build
+        - build-app
+        - lint-app:
+            requires: [build-app]
         # - lint-docker:
         #     requires: [build-frontend]
         # - lint-frontend:
