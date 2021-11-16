@@ -1,4 +1,7 @@
 FROM node:16-alpine3.13 as builder
+RUN apk add chromium
+ENV CHROME_BIN='/usr/bin/chromium-browser'
+
 
 WORKDIR /usr/src/app
 

@@ -45,6 +45,19 @@ jobs:
                 sudo npm i
                 npm run build
 
+  lint-docker:
+      docker: 
+        - image: python:3.7.3-stretch
+      steps:
+        - checkout
+        - restore_cache:
+            key: frontend-build
+        - run:
+            name: Install dependencies
+            command: |
+              venv/bin/activate
+              hadolint ./Dockerfile
+              
   # Lint the source code
   lint-frontend:
       docker:
@@ -61,18 +74,7 @@ jobs:
         # - run:
         #     name: Test source code
         #     command: npm run test
-  lint-docker:
-      docker: 
-        - image: python:3.7.3-stretch
-      steps:
-        - checkout
-        - restore_cache:
-            key: frontend-build
-        - run:
-            name: Install dependencies
-            command: |
-              venv/bin/activate
-              hadolint ./Dockerfile
+
         # Build project with different configuration based on the current branch
         # - run:
         #     name: Build project
