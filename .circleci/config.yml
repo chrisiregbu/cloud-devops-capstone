@@ -141,13 +141,13 @@ jobs:
             name: Deploy to S3
             command: |
                 if [ "${CIRCLE_BRANCH}" == "develop" ]; then
-                    aws s3 sync dist s3://dev-${AWS_ACCOUNT_ID}-bucket/ --delete
+                    aws s3 sync dist s3://dev-${AWS_ACCOUNT_ID}-bucket --delete
                 elif [ "${CIRCLE_BRANCH}" == "staging" ]; then
-                    aws s3 sync dist s3://qa-${AWS_ACCOUNT_ID}-bucket/ --delete
+                    aws s3 sync dist s3://qa-${AWS_ACCOUNT_ID}-bucket --delete
                 elif [ "${CIRCLE_BRANCH}" == "main" ]; then
-                    aws s3 sync dist s3://prod-${AWS_ACCOUNT_ID}-bucket/ --delete
+                    aws s3 sync dist s3://prod-${AWS_ACCOUNT_ID}-bucket --delete
                 elif [ "${CIRCLE_BRANCH}" == "master" ]; then
-                    aws s3 sync dist s3://prod-${AWS_ACCOUNT_ID}-bucket/ --delete
+                    aws s3 sync dist s3://prod-${AWS_ACCOUNT_ID}-bucket --delete
                 fi 
 workflows:
     default:
