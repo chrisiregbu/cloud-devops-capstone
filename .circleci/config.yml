@@ -92,7 +92,7 @@ jobs:
       - run:
           name: Run e2e test
           command: 
-            npm install -g karma-cli
+            sudo npm install -g karma-cli
             npm run test
       # Cache the dist folder for the deploy job
       - save_cache:
