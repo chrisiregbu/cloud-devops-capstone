@@ -7,32 +7,29 @@ ENV CHROME_BIN='/usr/bin/chromium-browser'
 
 # Copy the app code in the “app” folder
 RUN mkdir -p /app
+
 WORKDIR /app
-#WORKDIR /usr/src/app
 
 # Install app dependencies from package.json file 
 COPY package.json /app
-#COPY package.json ./
-#COPY public ./public
-COPY src  ./src
-COPY conf  ./conf
 
-#RUN npm install; npm run build 
+COPY src  ./src
+
 RUN npm install 
 
 COPY . /app
 
 # Create production build using Node image
 RUN  npm run build --prod
-#EXPOSE 3000
 
 # Step 2 - NGINX server
 
-# base image - use the Ngix server image to create the Nginx server
+# Base image - use the Ngix server image to create the Nginx server
 FROM nginx:1.19.4-alpine
 
-# update nginx conf
+# Update nginx conf
 RUN rm -rf /etc/nginx/conf.d
+
 COPY conf /etc/nginx
 
 # Copy/deploy the application (static) files to the Nginx server at /usr/share/Nginx/HTML location
@@ -42,5 +39,5 @@ COPY --from=build-step /app/dist/DemoApp /usr/share/nginx/html
 # expose port
 EXPOSE 80
 
-# run nginx
+# Run Nginx
 CMD ["nginx", "-g", "daemon off;"]
