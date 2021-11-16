@@ -93,7 +93,7 @@ jobs:
           name: Run E2E tests
           command: 
             sudo npm install -g karma-cli
-            npm run test:coverage
+            npm run test --code-coverage
       # Build project with different configuration based on the current branch
       - run:
           name: Build target branch 
