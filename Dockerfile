@@ -1,10 +1,9 @@
 FROM node:16-alpine3.13 as builder
 RUN apk add chromium
 #RUN apk add --no-cache  curl=7.61.1-r1
-RUN apk add --no-cache python3=3.9.*
+RUN apk add --no-cache <package>
 
 ENV CHROME_BIN='/usr/bin/chromium-browser'
-
 
 WORKDIR /usr/src/app
 
@@ -28,8 +27,6 @@ COPY conf /etc/nginx
 
 # copy static files
 COPY --from=builder /usr/src/app/build /usr/share/nginx/html
-
-RUN rm /var/cache/apk/*
 
 # expose port
 EXPOSE 80
