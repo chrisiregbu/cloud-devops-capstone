@@ -76,10 +76,10 @@ jobs:
         - run:
             name: Install dependencies
             command: |
-              python3 m venv venv
+              python3 -m venv venv
               cd venv/Scripts
               . activate
-              hadolint ./Dockerfile
+              hadolint Dockerfile
 
   # Lint the source code
   lint-frontend:
