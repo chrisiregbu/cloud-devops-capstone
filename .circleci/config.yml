@@ -60,11 +60,10 @@ jobs:
         - restore_cache:
             key: frontend-build
         - run:
-            name: Install project specific dependencies
-            command:  npm ci
-        - run:
             name: Lint frontend
-            command: npm run lint
+            command:
+              npm ci
+              npm run lint
 
   lint-docker:
       docker: 
