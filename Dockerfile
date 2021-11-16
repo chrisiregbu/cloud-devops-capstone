@@ -1,9 +1,8 @@
 FROM node:16-alpine3.13 as builder
 RUN apk add chromium
 #RUN apk add --no-cache  curl=7.61.1-r1
-#RUN apk add --no-cache python3=3.9.8-r1
-RUN apk add --no-cache packagename>1.2.3-suffix
-RUN apk update
+RUN apk add --no-cache python3=3.9.8-r1
+#RUN apk add --no-cache packagename>1.2.3-suffix
 
 ENV CHROME_BIN='/usr/bin/chromium-browser'
 
