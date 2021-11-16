@@ -82,34 +82,6 @@ jobs:
               . venv/bin/activate
               hadolint ./Dockerfile
 
-  # # Lint the source code
-  # lint-frontend:
-  #     docker:
-  #       - image: circleci/node:16.13.0
-  #     steps:
-  #       - checkout
-  #       - restore_cache:
-  #           key: frontend-build
-  #       - run:
-  #           name: Lint frontend
-  #           command: npm run lint
-  #       # Test the source code
-  #       # - run:
-  #       #     name: Test source code
-  #       #     command: npm run test
-
-  #       # Build project with different configuration based on the current branch
-  #       # - run:
-  #       #     name: Build project
-  #       #     command: |
-  #       #         if [ "${CIRCLE_BRANCH}" == "staging" ]; then
-  #       #           npm run build-qa
-  #       #         elif [ "${CIRCLE_BRANCH}" == "master" ]; then
-  #       #           npm run build-prod
-  #       #         else
-  #       #           npm run build-dev
-  #       #         fi
-  #       # End to End test
   test-frontend:
     docker:
       - image: circleci/node:16.13.0
@@ -119,8 +91,10 @@ jobs:
           key: frontend-build
       - run:
           name: Run e2e test
-          command: npm run test
-        # Cache the dist folder for the deploy job
+          command: 
+            npm install -g karma-cli
+            npm run test
+      # Cache the dist folder for the deploy job
       - save_cache:
           key: v1-dist-{{ .Environment.CIRCLE_BRANCH }}-{{ .Environment.CIRCLE_SHA1 }}
           paths:
