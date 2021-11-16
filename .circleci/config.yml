@@ -138,13 +138,13 @@ jobs:
                 name: Deploy to S3
                 command: |
                     if [ "${CIRCLE_BRANCH}" == "develop" ]; then
-                        aws --region ${AWS_DEFAULT_REGION} s3 sync dist s3://dev-bucket/ --delete
+                        aws --region ${AWS_DEFAULT_REGION} s3 sync dist s3://dev-${AWS_ACCOUNT}-bucket/ --delete
                     elif [ "${CIRCLE_BRANCH}" == "staging" ]; then
-                        aws --region ${AWS_DEFAULT_REGION} s3 sync dist s3://qa-bucket/ --delete
+                        aws --region ${AWS_DEFAULT_REGION} s3 sync dist s3://qa-${AWS_ACCOUNT}-bucket/ --delete
                     elif [ "${CIRCLE_BRANCH}" == "main" ]; then
-                        aws --region ${AWS_DEFAULT_REGION} s3 sync dist s3://project-bucket/ --delete
+                        aws --region ${AWS_DEFAULT_REGION} s3 sync dist s3://prod-${AWS_ACCOUNT}-bucket/ --delete
                     elif [ "${CIRCLE_BRANCH}" == "master" ]; then
-                        aws --region ${AWS_DEFAULT_REGION} s3 sync dist s3://project-bucket/ --delete
+                        aws --region ${AWS_DEFAULT_REGION} s3 sync dist s3://prod-${AWS_ACCOUNT}-bucket/ --delete
                     fi
                     #aws s3 cp s3://udacity-demo-1/udacity.zip .
                     #unzip -o udacity.zip
