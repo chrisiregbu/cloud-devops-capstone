@@ -93,7 +93,7 @@ jobs:
           name: Run E2E tests
           command: 
             sudo npm install -g karma-cli
-            npm run test
+            npm run test:coverage
       # Build project with different configuration based on the current branch
       - run:
           name: Build target branch 
@@ -137,18 +137,18 @@ jobs:
             name: Setting Signature Version 4 for S3 Request Authentication
             command: aws configure set default.s3.signature_version s3v4
         # Deploy to the S3 bucket corresponding to the current branch
-        - run:
-            name: Deploy to S3
-            command: |
-                if [ "${CIRCLE_BRANCH}" == "develop" ]; then
-                    aws s3 sync dist s3://dev-${AWS_ACCOUNT_ID}-bucket --delete
-                elif [ "${CIRCLE_BRANCH}" == "staging" ]; then
-                    aws s3 sync dist s3://qa-${AWS_ACCOUNT_ID}-bucket --delete
-                elif [ "${CIRCLE_BRANCH}" == "main" ]; then
-                    aws s3 sync dist s3://prod-${AWS_ACCOUNT_ID}-bucket --delete
-                elif [ "${CIRCLE_BRANCH}" == "master" ]; then
-                    aws s3 sync dist s3://prod-${AWS_ACCOUNT_ID}-bucket --delete
-                fi 
+        # - run:
+        #     name: Deploy to S3
+        #     command: |
+        #         if [ "${CIRCLE_BRANCH}" == "develop" ]; then
+        #             aws s3 sync dist s3://dev-${AWS_ACCOUNT_ID}-bucket --delete
+        #         elif [ "${CIRCLE_BRANCH}" == "staging" ]; then
+        #             aws s3 sync dist s3://qa-${AWS_ACCOUNT_ID}-bucket --delete
+        #         elif [ "${CIRCLE_BRANCH}" == "main" ]; then
+        #             aws s3 sync dist s3://prod-${AWS_ACCOUNT_ID}-bucket --delete
+        #         elif [ "${CIRCLE_BRANCH}" == "master" ]; then
+        #             aws s3 sync dist s3://prod-${AWS_ACCOUNT_ID}-bucket --delete
+        #         fi 
 workflows:
     default:
       jobs:
