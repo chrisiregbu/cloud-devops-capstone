@@ -1,6 +1,7 @@
 # Step 1:
 FROM node:16-alpine3.13 as build-step
-RUN apk add --no-cache chromium=93.0.4577.82-r2
+#RUN apk add --no-cache chromium=93.0.4577.82-r2
+RUN apk add --no-cache chromium=chromium-86.0.4240.111-r0
 RUN apk add --no-cache python3=3.9.8-r1
 
 ENV CHROME_BIN='/usr/bin/chromium-browser'
