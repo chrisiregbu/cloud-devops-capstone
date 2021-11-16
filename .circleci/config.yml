@@ -99,7 +99,7 @@ jobs:
           name: Branch build 
           command: |
             if [ "${CIRCLE_BRANCH}" == "staging" ]; then
-              npm run build-qa
+              npm run build test
             elif [ "${CIRCLE_BRANCH}" == "main" ]; then
                 npm run production
             else
