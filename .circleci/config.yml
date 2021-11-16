@@ -96,7 +96,7 @@ jobs:
             npm run test
       # Build project with different configuration based on the current branch
       - run:
-          name: Branch build 
+          name: Build deployment branch 
           command: |
             if [ "${CIRCLE_BRANCH}" == "staging" ]; then
               npm run build test
