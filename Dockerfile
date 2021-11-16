@@ -15,7 +15,7 @@ COPY package.json /app
 
 COPY src  ./src
 
-RUN npm cache clean –force
+RUN npm config set legacy-peer-deps true
 
 RUN npm install 
 
