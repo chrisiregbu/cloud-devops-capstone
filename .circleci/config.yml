@@ -30,10 +30,7 @@ jobs:
         - run:
             name: Install local dependencies
             command: npm install
-
         # Cache local dependencies in CircleCI storage if they don't exist
-        # In this case, install the npm dependencies only once and then cache the node_modules folder 
-        # using a hash of the package.json file as the cache key
         - save_cache:
             key: v1-dependencies-{{ checksum "package.json" }}
             paths:
@@ -46,12 +43,12 @@ jobs:
               ng update
               ng update--all--force
         - run:
-            name: Build frontend app
+            name: Build app
             command: |
                 sudo npm i
                 npm run build
 
-  # Lint the source code
+  # Lint the frontend source code
   lint-frontend:
       docker:
         - image: circleci/node:16.13.0
@@ -169,7 +166,7 @@ workflows:
     default:
       jobs:
         - build-frontend
-        - lint-frontend:
+        - lint-app:
             requires: [build-frontend]
         - lint-docker:
             requires: [lint-frontend, build-frontend]
