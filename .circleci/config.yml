@@ -167,14 +167,13 @@ jobs:
 workflows:
     default:
       jobs:
-        - build-frontend
-        - setup-env
-        - lint-docker:
-            requires: [build-frontend]
-        - lint-frontend:
-            requires: [lint-docker]
-        - test-frontend:
-            requires: [lint-frontend]
+        - build
+        # - lint-docker:
+        #     requires: [build-frontend]
+        # - lint-frontend:
+        #     requires: [lint-docker]
+        # - test-frontend:
+        #     requires: [lint-frontend]
           # The deploy job will only run on the filtered branches and
           # require the build job to be successful before it starts
           # - deploy:
