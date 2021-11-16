@@ -8,9 +8,9 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "build:prod": "node --version",
-    "build:dev": "node --version",
-    "build:qa": "node --version"
+    "build-prod": "node --version",
+    "build-dev": "node --version",
+    "build-qa": "node --version"
   },
   "private": true,
   "dependencies": {
