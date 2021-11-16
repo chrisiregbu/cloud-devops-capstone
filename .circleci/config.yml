@@ -166,7 +166,7 @@ workflows:
     default:
       jobs:
         - build-frontend
-        - lint-app:
+        - lint-frontend:
             requires: [build-frontend]
         - lint-docker:
             requires: [lint-frontend, build-frontend]
