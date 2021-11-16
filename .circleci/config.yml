@@ -90,7 +90,7 @@ jobs:
       - restore_cache:
           key: frontend-build
       - run:
-          name: Run e2e test
+          name: Run E2E tests
           command: 
             sudo npm install -g karma-cli
             npm run test
@@ -99,11 +99,12 @@ jobs:
           name: Build deployment branch 
           command: |
             if [ "${CIRCLE_BRANCH}" == "staging" ]; then
-              npm run build test
+              npm run build-qa
             elif [ "${CIRCLE_BRANCH}" == "main" ]; then
-                npm run production
+                cd /dist/DemoApp
+                npm run build-prod
             else
-                npm run dev
+                npm run build-dev
             fi
       # Cache the dist folder for the deploy job
       - save_cache:
