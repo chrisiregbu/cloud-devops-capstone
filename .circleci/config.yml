@@ -145,20 +145,18 @@ jobs:
             name: Deploy Docker Container Image to Amazon ECR
             command: |
               echo "Begin deploy docker container image:"
+
               echo "Step 1: Authenticating Docker client to AWS ECR registry..."
-              aws ecr get-login-password \
-                --region ${AWS_DEFAULT_REGION} \
-                | docker login --username AWS \
-                --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
+              aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin 471776097205.dkr.ecr.eu-west-2.amazonaws.com
 
               echo "Step 2: Building the container locally..."
               docker build -t cicloud-app .
 
               echo "Step 3: Tagging the image so that it can be pushed to the repository..."
-              docker build -t ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/cicloud-app:latest .
+              docker tag cicloud-app:latest 471776097205.dkr.ecr.eu-west-2.amazonaws.com/cicloud-app:latest
 
               echo "Step 4: Pushing the image the newly created Amazon repository..."              
-              docker push ${AWS_ACCOUNT_ID}.dkr.${AWS_DEFAULT_REGION}.amazonaws.com/cicloud-app:latest
+              docker push 471776097205.dkr.ecr.eu-west-2.amazonaws.com/cicloud-app:latest
 
               aws ecs update-service \
                 --cluster cicloud-app-cluster \
