@@ -142,20 +142,29 @@ jobs:
               unzip awscliv2.zip
               sudo ./aws/install
         - run:
-            name: Deploy Docker Image in ECR/ECS
+            name: Deploy Docker Container Image to Amazon ECR
             command: |
-              echo "Begin upload docker image:"
-              echo "authenticating with AWS ECR..."
-              aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
+              echo "Begin deploy docker container image:"
+              echo "Step 1: Authenticating Docker client to AWS ECR registry..."
+              aws ecr get-login-password \
+                --region ${AWS_DEFAULT_REGION} \
+                | docker login --username AWS \
+                --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
 
-              echo "Building docker image..."
+              echo "Step 2: Building the container locally..."
+              docker build -t cicloud-app .
+
+              echo "Step 3: Tagging the image so that it can be pushed to the repository..."
               docker build -t ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/cicloud-app:latest .
 
-              echo "Pushing image to AWS ECR..."
+              echo "Step 4: Pushing the image the newly created Amazon repository..."              
               docker push ${AWS_ACCOUNT_ID}.dkr.${AWS_DEFAULT_REGION}.amazonaws.com/cicloud-app:latest
 
-              echo "Updating AWS ECS service..."
-              aws ecs update-service --cluster cicloud-app-cluster --service angular-svc --force-new-deployment --no-cli-pager
+              aws ecs update-service \
+                --cluster cicloud-app-cluster \
+                --service angular-svc \
+                --force-new-deployment \
+                --no-cli-pager
 
               echo "End upload docker image!"
 workflows:
