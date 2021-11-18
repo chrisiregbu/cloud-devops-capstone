@@ -125,46 +125,71 @@ jobs:
             docker push ${DOCKER_LOGIN}/cicloud-app:latest
 
   # Now, we deploy our angular app
-  deploy-app:
-      docker:
-        - image: circleci/node:16.13.0
-      working_directory: ~/project
-      steps:
-        - checkout
-        - restore_cache:
-            key: frontend-build
-        - run:
-            name: Install AWS CLI dependencies
-            command: |
-              sudo apt-get update && sudo apt-get install -yy less
-              sudo apt-get install unzip -y
-              curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-              unzip awscliv2.zip
-              sudo ./aws/install
-        - run:
-            name: Deploy Docker Container Image to Amazon ECR
-            command: |
-              echo "Begin deploy docker container image:"
+  deploy-frontend:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            yum -y install tar 
+            yum -y install gzip
+            curl -sL https://rpm.nodesource.com/setup_lts.x | bash -
+            yum -y install nodejs
+      - attach_workspace:
+          at: ./
+      - run:
+          name: Deploy frontend objects
+          command: |
+            cd dist/DemoApp
+            npm install
+            npm run build
+            tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
+            aws s3 cp dist s3://cicloud-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+      # - destroy-environment:
+      #     workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
-              echo "Step 1: Authenticating Docker client to AWS ECR registry..."
-              aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin 471776097205.dkr.ecr.eu-west-2.amazonaws.com
+  # deploy-app:
+  #     docker:
+  #       - image: circleci/node:16.13.0
+  #     working_directory: ~/project
+  #     steps:
+  #       - checkout
+  #       - restore_cache:
+  #           key: frontend-build
+  #       - run:
+  #           name: Install AWS CLI dependencies
+  #           command: |
+  #             sudo apt-get update && sudo apt-get install -yy less
+  #             sudo apt-get install unzip -y
+  #             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+  #             unzip awscliv2.zip
+  #             sudo ./aws/install
+  #       - run:
+  #           name: Deploy Docker Container Image to Amazon ECR
+  #           command: |
+  #             echo "Begin deploy docker container image:"
 
-              echo "Step 2: Building the container locally..."
-              docker build -t cicloud-app .
+  #             echo "Step 1: Authenticating Docker client to AWS ECR registry..."
+  #             aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin 471776097205.dkr.ecr.eu-west-2.amazonaws.com
 
-              echo "Step 3: Tagging the image so that it can be pushed to the repository..."
-              docker tag cicloud-app:latest 471776097205.dkr.ecr.eu-west-2.amazonaws.com/cicloud-app:latest
+  #             echo "Step 2: Building the container locally..."
+  #             docker build -t cicloud-app .
 
-              echo "Step 4: Pushing the image the newly created Amazon repository..."              
-              docker push 471776097205.dkr.ecr.eu-west-2.amazonaws.com/cicloud-app:latest
+  #             echo "Step 3: Tagging the image so that it can be pushed to the repository..."
+  #             docker tag cicloud-app:latest 471776097205.dkr.ecr.eu-west-2.amazonaws.com/cicloud-app:latest
 
-              aws ecs update-service \
-                --cluster cicloud-app-cluster \
-                --service angular-svc \
-                --force-new-deployment \
-                --no-cli-pager
+  #             echo "Step 4: Pushing the image the newly created Amazon repository..."              
+  #             docker push 471776097205.dkr.ecr.eu-west-2.amazonaws.com/cicloud-app:latest
 
-              echo "End upload docker image!"
+  #             aws ecs update-service \
+  #               --cluster cicloud-app-cluster \
+  #               --service angular-svc \
+  #               --force-new-deployment \
+  #               --no-cli-pager
+
+  #             echo "End upload docker image!"
 workflows:
     default:
       jobs:
@@ -184,10 +209,10 @@ workflows:
             requires: [build-container]
           # The deploy job will only run on the filtered branches and
           # require the build job to be successful before it starts
-            filters:
-              branches:
-                only:
-                  - develop
-                  - staging
-                  - main
-                  - master
+            # filters:
+            #   branches:
+            #     only:
+            #       - develop
+            #       - staging
+            #       - main
+            #       - master
