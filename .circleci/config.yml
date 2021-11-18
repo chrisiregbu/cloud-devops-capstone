@@ -120,13 +120,16 @@ jobs:
         # Test the source code
         - run:
             name: Test source code
-            command: npm run test -- --no-watch --no-progress --browsers=ChromeHeadlessCI
+            command: 
+                export CHROME_BIN='C:/Program Files (x86)/Google/Chrome/Application'
+                npm run test -- --no-watch --no-progress --browsers=ChromeHeadlessCI
         # End to End Test - invoke protractor to serve the app
         # ng test --no-watch --no-progress --browsers=ChromeHeadlessCI
         # ng e2e --protractor -config=e2e/protractor-ci.conf.js
         - run:
             name: Run E2E tests
             command: 
+                export CHROME_BIN='C:/Program Files (x86)/Google/Chrome/Application'
                 sudo npm install -g karma-cli
                 npm run test --code-coverage
                 npm run e2e -- --protractor-config=e2e/protractor-ci.conf.js
