@@ -205,8 +205,8 @@ workflows:
             filters:
               branches:
                 only: [main]
-        - deploy-app:
-            requires: [build-container]
+        # - deploy-app:
+        #     requires: [build-container]
           # The deploy job will only run on the filtered branches and
           # require the build job to be successful before it starts
             # filters:
