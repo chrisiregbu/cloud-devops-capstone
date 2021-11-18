@@ -15,17 +15,17 @@ commands:
       workflow_id:
         type: string
     steps:
-      - run:
-          name: Destroy environment << parameters.workflow_id >>
-          # ${CIRCLE_WORKFLOW_ID} is a Built-in environment variable whereas  
-          # ${CIRCLE_WORKFLOW_ID:0:7} takes the first 7 chars of the variable CIRCLE_CI_WORKFLOW_ID 
-          when: on_fail
-          command: |
-            if aws s3 ls | grep cicloudapp-<< parameters.workflow_id >>; then
-              echo "Destroying environment: << parameters.workflow_id >> "
-              aws s3 rm s3://cicloudapp-<< parameters.workflow_id >> --recursive
-            fi
-            aws cloudformation delete-stack --stack-name cicloudapp-frontend-<< parameters.workflow_id >>
+        - run:
+            name: Destroy environment << parameters.workflow_id >>
+            # ${CIRCLE_WORKFLOW_ID} is a Built-in environment variable whereas  
+            # ${CIRCLE_WORKFLOW_ID:0:7} takes the first 7 chars of the variable CIRCLE_CI_WORKFLOW_ID 
+            when: on_fail
+            command: |
+                if aws s3 ls | grep cicloudapp-<< parameters.workflow_id >>; then
+                  echo "Destroying environment: << parameters.workflow_id >> "
+                  aws s3 rm s3://cicloudapp-<< parameters.workflow_id >> --recursive
+                fi
+                aws cloudformation delete-stack --stack-name cicloudapp-frontend-<< parameters.workflow_id >>
 
 jobs:
   build-frontend:
@@ -67,8 +67,8 @@ jobs:
         - run:
             name: Build app
             command: |
-                sudo npm i
-                npm run build
+              sudo npm i
+              npm run build
         - destroy-environment:
             workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
@@ -98,89 +98,89 @@ jobs:
         - run:
             name: Lint docker
             command: |
-              python3 -m venv venv
-              . venv/bin/activate
-              wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 &&\
-              chmod +x /bin/hadolint
+                python3 -m venv venv
+                . venv/bin/activate
+                wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 &&\
+                chmod +x /bin/hadolint
         - run:
             name: run lint
             command: |
-              . venv/bin/activate
-              hadolint ./Dockerfile
+                . venv/bin/activate
+                hadolint ./Dockerfile
         - destroy-environment:
             workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
   test-frontend:
     docker:
-      - image: circleci/node:16.13.0
+        - image: circleci/node:16.13.0
     steps:
-      - checkout
-      - restore_cache:
-          key: frontend-build
-      - run:
-          name: Run E2E tests
-          command: 
-            sudo npm install -g karma-cli
-            npm run test --code-coverage
+        - checkout
+        - restore_cache:
+            key: frontend-build
+        - run:
+            name: Run E2E tests
+            command: 
+                sudo npm install -g karma-cli
+                npm run test --code-coverage
       # Build project with different configuration based on the current branch
-      - run:
-          name: Build target branch 
-          command: |
-            if [ "${CIRCLE_BRANCH}" == "staging" ]; then
-              npm run build-qa
-            elif [ "${CIRCLE_BRANCH}" == "main" ]; then
-                npm run build-prod
-            else
-                npm run build-dev
-            fi
+        - run:
+            name: Build target branch 
+            command: |
+                if [ "${CIRCLE_BRANCH}" == "staging" ]; then
+                  npm run build-qa
+                elif [ "${CIRCLE_BRANCH}" == "main" ]; then
+                  npm run build-prod
+                else
+                  npm run build-dev
+                fi
       # Cache the dist folder for the deploy job
-      - save_cache:
-          key: v1-dist-{{ .Environment.CIRCLE_BRANCH }}-{{ .Environment.CIRCLE_SHA1 }}
-          paths:
-            - dist
-      - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+        - save_cache:
+            key: v1-dist-{{ .Environment.CIRCLE_BRANCH }}-{{ .Environment.CIRCLE_SHA1 }}
+            paths:
+              - dist
+        - destroy-environment:
+            workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
   build-container: # https://dzone.com/articles/how-to-dockerize-angular-app
     machine: true
     steps:
-      - checkout
-      - run:
-          name: Build docker container
-          command: |
-            docker login --username ${DOCKER_LOGIN} --password ${Docker_PWD}
-            docker build -t cicloud-app:latest . 
-            docker images ls
-            docker tag cicloud-app ${DOCKER_LOGIN}/cicloud-app:latest
-            docker push ${DOCKER_LOGIN}/cicloud-app:latest
-      - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+        - checkout
+        - run:
+            name: Build docker container
+            command: |
+                docker login --username ${DOCKER_LOGIN} --password ${Docker_PWD}
+                docker build -t cicloud-app:latest . 
+                docker images ls
+                docker tag cicloud-app ${DOCKER_LOGIN}/cicloud-app:latest
+                docker push ${DOCKER_LOGIN}/cicloud-app:latest
+        - destroy-environment:
+            workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
   # Now, we deploy our angular app
   deploy-frontend:
     docker:
-      - image: amazon/aws-cli
+        - image: amazon/aws-cli
     steps:
-      - checkout
-      - run:
-          name: Install dependencies
-          command: |
-            yum -y install tar 
-            yum -y install gzip
-            curl -sL https://rpm.nodesource.com/setup_lts.x | bash -
-            yum -y install nodejs
-      - attach_workspace:
-          at: ./
-      - run:
-          name: Deploy frontend objects
-          command: |
-            cd dist/DemoApp
-            npm install
-            npm run build
-            tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
-            aws s3 cp dist s3://cicloud-${CIRCLE_WORKFLOW_ID:0:7} --recursive
-      - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+        - checkout
+        - run:
+            name: Install dependencies
+            command: |
+                yum -y install tar 
+                yum -y install gzip
+                curl -sL https://rpm.nodesource.com/setup_lts.x | bash -
+                yum -y install nodejs
+        - attach_workspace:
+            at: ./
+        - run:
+            name: Deploy frontend objects
+            command: |
+                cd dist/DemoApp
+                npm install
+                npm run build
+                tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
+                aws s3 cp dist s3://cicloud-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+        - destroy-environment:
+            workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
   # deploy-app:
   #     docker:
