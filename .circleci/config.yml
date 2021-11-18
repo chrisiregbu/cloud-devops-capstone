@@ -241,10 +241,10 @@ workflows:
         - test-app:
             requires: [lint-frontend]
         - build-container:
-            requires: [test-frontend, lint-frontend, lint-docker]
+            requires: [test-app, lint-frontend, lint-docker]
             filters:
               branches:
-                only: [main]
+                only: [master]
         # - deploy-app:
         #     requires: [build-container]
           # The deploy job will only run on the filtered branches and
