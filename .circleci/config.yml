@@ -40,7 +40,7 @@ jobs:
         - checkout
         # Log the current branch for debugging purposes
         - run:
-            name: Show current branch
+            name: Log the current branch
             command: echo ${CIRCLE_BRANCH}
         # Restore local dependencies (node_modules) from the CircleCI cache if it exists
         - restore_cache:
@@ -110,18 +110,26 @@ jobs:
         - destroy-environment:
             workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
-  test-frontend:
+  test-app:
     docker:
         - image: circleci/node:16.13.0
     steps:
         - checkout
         - restore_cache:
             key: frontend-build
+        # Test the source code
+        - run:
+            name: Test source code
+            command: npm run test -- --no-watch --no-progress --browsers=ChromeHeadlessCI
+        # End to End Test - invoke protractor to serve the app
+        # ng test --no-watch --no-progress --browsers=ChromeHeadlessCI
+        # ng e2e --protractor -config=e2e/protractor-ci.conf.js
         - run:
             name: Run E2E tests
             command: 
                 sudo npm install -g karma-cli
                 npm run test --code-coverage
+                npm run e2e -- --protractor-config=e2e/protractor-ci.conf.js
       # Build project with different configuration based on the current branch
         - run:
             name: Build target branch 
@@ -157,7 +165,7 @@ jobs:
             workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
   # Now, we deploy our angular app
-  deploy-frontend:
+  deploy-app:
     docker:
         - image: amazon/aws-cli
     steps:
@@ -230,7 +238,7 @@ workflows:
             requires: [build-frontend]
         - lint-docker:
             requires: [lint-frontend, build-frontend]
-        - test-frontend:
+        - test-app:
             requires: [lint-frontend]
         - build-container:
             requires: [test-frontend, lint-frontend, lint-docker]
