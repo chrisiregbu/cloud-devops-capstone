@@ -137,7 +137,7 @@ jobs:
           name: Run E2E tests
           command:  npm run test:coverage
 
-  push-and-push-container: # https://dzone.com/articles/how-to-dockerize-angular-app
+  push-container: # https://dzone.com/articles/how-to-dockerize-angular-app
     machine: true
     steps:
       - checkout
@@ -196,7 +196,7 @@ workflows:
             requires: [lint-app, build-app]
         - test-app:
             requires: [build-app]
-        - push-and-push-container:
+        - push-container:
             requires: [test-app, lint-app, lint-docker]
             filters:
               branches:
