@@ -110,45 +110,45 @@ jobs:
       - destroy-environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
-  test-app:
-    docker:
-      - image: circleci/node:16.13.0
-    steps:
-      - checkout
-      - restore_cache:
-          key: frontend-build
-      # Test the source code
-      - run:
-          name: Test source code
-          command: 
-            sudo npm install -g karma-cli
-            npm run test --code-coverage
-      - run:
-          name: Run E2E tests
-          command: 
-            sudo npm install -g karma-cli
-            npm i -D puppeteer karma-chrome-launcher
-            npm run test-headless
-            npm run e2e -- --protractor-config=e2e/protractor-ci.conf.js
-            ansible-playbook -i docker-compose.yml
-      # Build project with different configuration based on the current branch
-      - run:
-          name: Build target branch 
-          command: |
-            if [ "${CIRCLE_BRANCH}" == "staging" ]; then
-              npm run build-qa
-            elif [ "${CIRCLE_BRANCH}" == "main" ]; then
-              npm run build-prod
-            else
-              npm run build-dev
-            fi
-      # Cache the dist folder for the deploy job
-      - save_cache:
-          key: v1-dist-{{ .Environment.CIRCLE_BRANCH }}-{{ .Environment.CIRCLE_SHA1 }}
-          paths:
-            - dist
-      - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+  # test-app:
+  #   docker:
+  #     - image: circleci/node:16.13.0
+  #   steps:
+  #     - checkout
+  #     - restore_cache:
+  #         key: frontend-build
+  #     # Test the source code
+  #     - run:
+  #         name: Test source code
+  #         command: 
+  #           sudo npm install -g karma-cli
+  #           npm run test --code-coverage
+  #     - run:
+  #         name: Run E2E tests
+  #         command: 
+  #           sudo npm install -g karma-cli
+  #           npm i -D puppeteer karma-chrome-launcher
+  #           npm run test-headless
+  #           npm run e2e -- --protractor-config=e2e/protractor-ci.conf.js
+  #           ansible-playbook -i docker-compose.yml
+  #     # Build project with different configuration based on the current branch
+  #     - run:
+  #         name: Build target branch 
+  #         command: |
+  #           if [ "${CIRCLE_BRANCH}" == "staging" ]; then
+  #             npm run build-qa
+  #           elif [ "${CIRCLE_BRANCH}" == "main" ]; then
+  #             npm run build-prod
+  #           else
+  #             npm run build-dev
+  #           fi
+  #     # Cache the dist folder for the deploy job
+  #     - save_cache:
+  #         key: v1-dist-{{ .Environment.CIRCLE_BRANCH }}-{{ .Environment.CIRCLE_SHA1 }}
+  #         paths:
+  #           - dist
+  #     - destroy-environment:
+  #         workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
   # Scan for known vulnerabilities
   scan-app:
@@ -250,13 +250,17 @@ workflows:
             requires: [build-app]
         - lint-docker:
             requires: [lint-app, build-app]
-        - test-app:
-            requires: [lint-app]
+        # - test-app:
+        #     requires: [lint-app]
         - build-container:
-            requires: [test-app, lint-app, lint-docker]
+            requires: [lint-app, lint-docker]
             filters:
               branches:
-                only: [master]
+                only: 
+                  - develop
+                  - master
+                  - main
+                  - staging
         # - deploy-app:
         #     requires: [build-container]
           # The deploy job will only run on the filtered branches and
