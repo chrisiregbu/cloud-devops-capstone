@@ -1,15 +1,15 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cicloud
+  name: ciangularapp
   labels:
-    app: cicloud-app
+    app: ciangularapp
   namespace: default
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: cicloud-app
+      app: ciangularapp
   strategy:
     rollingUpdate:
       maxSurge: 25%
@@ -18,12 +18,12 @@ spec:
   template:
     metadata:
       labels:
-        app: cicloud-app
+        app: ciangularapp
     spec:
       containers:
-        - image: ciregbu/cicloud-app:latest
+        - image: ciregbu/ciangularapp:latest
           imagePullPolicy: Always
-          name: cicloud
+          name: ciangularapp
           ports:
             - containerPort: 3000
 
@@ -31,13 +31,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: cicloud
+  name: ciangularapp
   labels:
-    app: cicloud-app
+    app: ciangularapp
 spec:
   type: LoadBalancer
   selector:
-    app: cicloud-app
+    app: ciangularapp
   ports:
     - port: 3000
       targetPort: 3000

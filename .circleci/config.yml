@@ -110,46 +110,6 @@ jobs:
       - destroy-environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
-  # test-app:
-  #   docker:
-  #     - image: circleci/node:16.13.0
-  #   steps:
-  #     - checkout
-  #     - restore_cache:
-  #         key: frontend-build
-  #     # Test the source code
-  #     - run:
-  #         name: Test source code
-  #         command: 
-  #           sudo npm install -g karma-cli
-  #           npm run test --code-coverage
-  #     - run:
-  #         name: Run E2E tests
-  #         command: 
-  #           sudo npm install -g karma-cli
-  #           npm i -D puppeteer karma-chrome-launcher
-  #           npm run test-headless
-  #           npm run e2e -- --protractor-config=e2e/protractor-ci.conf.js
-  #           ansible-playbook -i docker-compose.yml
-  #     # Build project with different configuration based on the current branch
-  #     - run:
-  #         name: Build target branch 
-  #         command: |
-  #           if [ "${CIRCLE_BRANCH}" == "staging" ]; then
-  #             npm run build-qa
-  #           elif [ "${CIRCLE_BRANCH}" == "main" ]; then
-  #             npm run build-prod
-  #           else
-  #             npm run build-dev
-  #           fi
-  #     # Cache the dist folder for the deploy job
-  #     - save_cache:
-  #         key: v1-dist-{{ .Environment.CIRCLE_BRANCH }}-{{ .Environment.CIRCLE_SHA1 }}
-  #         paths:
-  #           - dist
-  #     - destroy-environment:
-  #         workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
-
   # Scan for known vulnerabilities
   scan-app:
     docker:
@@ -160,87 +120,71 @@ jobs:
           name: Scan application files
           command: npm install
 
-  build-container: # https://dzone.com/articles/how-to-dockerize-angular-app
+  test-app:
+    docker:
+      - image: circleci/node:16.13.0
+    steps:
+      - checkout
+      - restore_cache:
+          key: frontend-build
+      # Test the source code
+      - run:
+          name: Test frontend source code
+          command: 
+            sudo npm install -g karma-cli
+            npm run test --code-coverage
+      - run:
+          name: Run E2E tests
+          command:  npm run test:coverage
+
+  push-and-push-container: # https://dzone.com/articles/how-to-dockerize-angular-app
     machine: true
     steps:
       - checkout
       - run:
           name: Build docker container
           command: |
-              docker login --username ${DOCKER_LOGIN} --password ${Docker_PWD}
-              docker build -t cicloud-app:latest . 
-              docker images ls
-              docker tag cicloud-app ${DOCKER_LOGIN}/cicloud-app:latest
-              docker push ${DOCKER_LOGIN}/cicloud-app:latest
-      - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+            docker login --username ${DOCKER_LOGIN} --password ${Docker_PWD}
+            docker build -t ciangularapp:latest . 
+            docker images ls
+            docker tag ciangularapp ${DOCKER_LOGIN}/ciangularapp:latest
+            docker push ${DOCKER_LOGIN}/ciangularapp:latest
 
-  # Now, we deploy our angular app
+  # Deploy the angular app
   deploy-app:
-    docker:
-      - image: amazon/aws-cli
-    steps:
-      - checkout
-      - run:
-          name: Install dependencies
-          command: |
-              yum -y install tar 
-              yum -y install gzip
-              curl -sL https://rpm.nodesource.com/setup_lts.x | bash -
-              yum -y install nodejs
-      - attach_workspace:
-          at: ./
-      - run:
-          name: Deploy frontend objects
-          command: |
-              cd dist/DemoApp
-              npm install
-              npm run build
-              tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
-              aws s3 cp dist s3://cicloud-${CIRCLE_WORKFLOW_ID:0:7} --recursive
-      - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      docker:
+        - image: circleci/node:16.13.0
+      working_directory: ~/project
+      steps:
+        - checkout
+        - restore_cache:
+            key: frontend-build
+        - run:
+            name: Install AWS CLI dependencies
+            command: |
+              sudo apt-get update && sudo apt-get install -yy less
+              sudo apt-get install unzip -y
+              curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+              unzip awscliv2.zip
+              sudo ./aws/install
+        - run:
+            name: Deploy Docker Container Image to Amazon ECR
+            command: |
+              echo "Step 1: Authenticating Docker client to AWS ECR registry..."
+              aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin 471776097205.dkr.ecr.eu-west-2.amazonaws.com
 
-  # deploy-app:
-  #     docker:
-  #       - image: circleci/node:16.13.0
-  #     working_directory: ~/project
-  #     steps:
-  #       - checkout
-  #       - restore_cache:
-  #           key: frontend-build
-  #       - run:
-  #           name: Install AWS CLI dependencies
-  #           command: |
-  #             sudo apt-get update && sudo apt-get install -yy less
-  #             sudo apt-get install unzip -y
-  #             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-  #             unzip awscliv2.zip
-  #             sudo ./aws/install
-  #       - run:
-  #           name: Deploy Docker Container Image to Amazon ECR
-  #           command: |
-  #             echo "Begin deploy docker container image:"
+              echo "Step 2: Building the container locally..."
+              docker build -t 471776097205.dkr.ecr.eu-west-2.amazonaws.com/ciangularapp:latest .
 
-  #             echo "Step 1: Authenticating Docker client to AWS ECR registry..."
-  #             aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin 471776097205.dkr.ecr.eu-west-2.amazonaws.com
+              echo "Step 3: Tagging the image so that it can be pushed to the repository..."
+              docker tag ciangularapp:latest 471776097205.dkr.ecr.eu-west-2.amazonaws.com/ciangularapp:latest
 
-  #             echo "Step 2: Building the container locally..."
-  #             docker build -t cicloud-app .
+              echo "Step 4: Pushing the image the newly created Amazon repository..."              
+              docker push 471776097205.dkr.ecr.eu-west-2.amazonaws.com/ciangularapp:latest
 
-  #             echo "Step 3: Tagging the image so that it can be pushed to the repository..."
-  #             docker tag cicloud-app:latest 471776097205.dkr.ecr.eu-west-2.amazonaws.com/cicloud-app:latest
+              aws ecs update-service --cluster ciangularapp-cluster --service angular-svc --force-new-deployment --no-cli-pager
 
-  #             echo "Step 4: Pushing the image the newly created Amazon repository..."              
-  #             docker push 471776097205.dkr.ecr.eu-west-2.amazonaws.com/cicloud-app:latest
-
-  #             aws ecs update-service \
-  #               --cluster cicloud-app-cluster \
-  #               --service angular-svc \
-  #               --force-new-deployment \
-  #               --no-cli-pager
-
-  #             echo "End upload docker image!"
+              echo "Docker image upload completed!"
 workflows:
     default:
       jobs:
@@ -250,19 +194,16 @@ workflows:
             requires: [build-app]
         - lint-docker:
             requires: [lint-app, build-app]
-        # - test-app:
-        #     requires: [lint-app]
-        - build-container:
-            requires: [lint-app, lint-docker]
+        - test-app:
+            requires: [build-app]
+        - push-and-push-container:
+            requires: [test-app, lint-app, lint-docker]
             filters:
               branches:
-                only: 
-                  - develop
-                  - master
-                  - main
-                  - staging
+                only: [main]
         # - deploy-app:
         #     requires: [build-container]
+
           # The deploy job will only run on the filtered branches and
           # require the build job to be successful before it starts
             # filters:

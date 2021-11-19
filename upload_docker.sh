@@ -5,7 +5,7 @@
 
 # Step 1:
 # Create dockerpath
-dockerpath=ciregbu/cicloud-app
+dockerpath=ciregbu/ciangularapp
 
 # Step 2:  
 # Authenticate & tag
@@ -14,5 +14,5 @@ echo "Docker ID and Image: $dockerpath"
 # Step 3:
 # Push image to a docker repository
 docker login -u ciregbu
-docker tag cicloud-app $dockerpath:latest
+docker tag ciangularapp $dockerpath:latest
 docker push $dockerpath:latest

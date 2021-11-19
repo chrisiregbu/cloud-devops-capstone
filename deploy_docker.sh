@@ -8,13 +8,13 @@ aws ecr get-login-password --region eu-west-2 \
 
 echo "Build Steps:"
 echo "building image..."
-docker build -t 471776097205.dkr.ecr.eu-west-2.amazonaws.com/awscicd:latest .
+docker build -t 471776097205.dkr.ecr.eu-west-2.amazonaws.com/ciangularapp:latest .
 
 echo "Post-Build Steps:"
 echo "pushing image to AWS ECR..."
-docker push 471776097205.dkr.ecr.eu-west-2.amazonaws.com/awscicd:latest
+docker push 471776097205.dkr.ecr.eu-west-2.amazonaws.com/ciangularapp:latest
 
 echo "updating AWS ECS service..."
-aws ecs update-service --cluster awscicd-cluster --service angular-svc --force-new-deployment --no-cli-pager
+aws ecs update-service --cluster ciangularapp-cluster --service angular-svc --force-new-deployment --no-cli-pager
 
 echo "Done!"
