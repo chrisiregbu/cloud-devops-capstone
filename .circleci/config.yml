@@ -137,7 +137,7 @@ jobs:
           name: Run E2E tests
           command:  npm run
 
-  push-container: # https://dzone.com/articles/how-to-dockerize-angular-app
+  build-container: # https://dzone.com/articles/how-to-dockerize-angular-app
     machine: true
     steps:
       - checkout
@@ -189,27 +189,27 @@ workflows:
     default:
       jobs:
         - build-app
-        - scan-app
+        - scan-app:
+            requires: [build-app]
         - lint-app:
             requires: [build-app]
         - lint-docker:
             requires: [lint-app, build-app]
         - test-app:
             requires: [build-app]
-        - push-container:
+        - build-container:
             requires: [test-app, lint-app, lint-docker]
             filters:
               branches:
                 only: [main]
-        # - deploy-app:
-        #     requires: [build-container]
-
-          # The deploy job will only run on the filtered branches and
-          # require the build job to be successful before it starts
-            # filters:
-            #   branches:
-            #     only:
-            #       - develop
-            #       - staging
-            #       - main
-            #       - master
+        # The deploy job will only run on the filtered branches and
+        # require the build job to be successful before it starts
+        - deploy-app:
+            requires: [build-container]
+            filters:
+              branches:
+                only:
+                  - develop
+                  - staging
+                  - main
+                  - master
