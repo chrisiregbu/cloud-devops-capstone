@@ -135,7 +135,7 @@ jobs:
             npm run test --code-coverage
       - run:
           name: Run E2E tests
-          command:  npm run test:coverage
+          command:  npm run test:e2e
 
   push-container: # https://dzone.com/articles/how-to-dockerize-angular-app
     machine: true
