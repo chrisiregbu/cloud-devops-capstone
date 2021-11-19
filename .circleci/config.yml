@@ -15,183 +15,191 @@ commands:
       workflow_id:
         type: string
     steps:
-        - run:
-            name: Destroy environment << parameters.workflow_id >>
-            # ${CIRCLE_WORKFLOW_ID} is a Built-in environment variable whereas  
-            # ${CIRCLE_WORKFLOW_ID:0:7} takes the first 7 chars of the variable CIRCLE_CI_WORKFLOW_ID 
-            when: on_fail
-            command: |
-                if aws s3 ls | grep cicloudapp-<< parameters.workflow_id >>; then
-                  echo "Destroying environment: << parameters.workflow_id >> "
-                  aws s3 rm s3://cicloudapp-<< parameters.workflow_id >> --recursive
-                fi
-                aws cloudformation delete-stack --stack-name cicloudapp-frontend-<< parameters.workflow_id >>
+      - run:
+          name: Destroy environment << parameters.workflow_id >>
+          # ${CIRCLE_WORKFLOW_ID} is a Built-in environment variable whereas  
+          # ${CIRCLE_WORKFLOW_ID:0:7} takes the first 7 chars of the variable CIRCLE_CI_WORKFLOW_ID 
+          when: on_fail
+          command: |
+              if aws s3 ls | grep cicloudapp-<< parameters.workflow_id >>; then
+                echo "Destroying environment: << parameters.workflow_id >> "
+                aws s3 rm s3://cicloudapp-<< parameters.workflow_id >> --recursive
+              fi
+              aws cloudformation delete-stack --stack-name cicloudapp-frontend-<< parameters.workflow_id >>
 
 jobs:
-  build-frontend:
+  build-app:
     docker:
-        - image: circleci/node:16.13.0
+      - image: circleci/node:16.13.0
     
     # The current directory will be the place where all the steps will run
     working_directory: ~/project
 
     steps:
-        # Checkout the code from the git branch into the working_directory
-        - checkout
-        # Log the current branch for debugging purposes
-        - run:
-            name: Log the current branch
-            command: echo ${CIRCLE_BRANCH}
-        # Restore local dependencies (node_modules) from the CircleCI cache if it exists
-        - restore_cache:
-            keys:
-            - v1-dependencies-{{ checksum "package.json" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
-        # Install project dependencies
-        - run:
-            name: Install local dependencies
-            command: npm install
-        # Cache local dependencies in CircleCI storage if they don't exist
-        - save_cache:
-            key: v1-dependencies-{{ checksum "package.json" }}
-            paths:
-                - node_modules
-        # Install project dependencies
-        - run:
-            name: Install local dependencies
-            command: 
-              npm update
-              ng update
-              ng update--all--force
-        - run:
-            name: Build app
-            command: |
-              sudo npm i
-              npm run build
-        - destroy-environment:
-            workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      # Checkout the code from the git branch into the working_directory
+      - checkout
+      # Log the current branch for debugging purposes
+      - run:
+          name: Log the current branch
+          command: echo ${CIRCLE_BRANCH}
+      # Restore local dependencies (node_modules) from the CircleCI cache if it exists
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "package.json" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-
+      # Install project dependencies
+      - run:
+          name: Install local dependencies
+          command: npm install
+      # Cache local dependencies in CircleCI storage if they don't exist
+      - save_cache:
+          key: v1-dependencies-{{ checksum "package.json" }}
+          paths:
+              - node_modules
+      # Install project dependencies
+      - run:
+          name: Install local dependencies
+          command: 
+            npm update
+            ng update
+            ng update--all--force
+      - run:
+          name: Build app
+          command: |
+            sudo npm i
+            npm run build
+      - destroy-environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
   # Lint the frontend source code
-  lint-frontend:
-      docker:
-        - image: circleci/node:16.13.0
-      steps:
-        - checkout
-        - restore_cache:
-            key: frontend-build
-        - run:
-            name: Lint frontend
-            command:
-              npm ci
-              npm run lint
-        - destroy-environment:
-            workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+  lint-app:
+    docker:
+      - image: circleci/node:16.13.0
+    steps:
+      - checkout
+      - restore_cache:
+          key: frontend-build
+      - run:
+          name: Lint frontend
+          command:
+            npm ci
+            npm run lint
+      - destroy-environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
   lint-docker:
-      docker: 
-        - image: python:3.7.3-stretch
-      steps:
-        - checkout
-        - restore_cache:
-            key: frontend-build
-        - run:
-            name: Lint docker
-            command: |
-                python3 -m venv venv
-                . venv/bin/activate
-                wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 &&\
-                chmod +x /bin/hadolint
-        - run:
-            name: run lint
-            command: |
-                . venv/bin/activate
-                hadolint ./Dockerfile
-        - destroy-environment:
-            workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+    docker: 
+      - image: python:3.7.3-stretch
+    steps:
+      - checkout
+      - restore_cache:
+          key: frontend-build
+      - run:
+          name: Lint docker
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 &&\
+            chmod +x /bin/hadolint
+      - run:
+          name: run lint
+          command: |
+            . venv/bin/activate
+            hadolint ./Dockerfile
+      - destroy-environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
   test-app:
     docker:
-        - image: circleci/node:16.13.0
+      - image: circleci/node:16.13.0
     steps:
-        - checkout
-        - restore_cache:
-            key: frontend-build
-        # Test the source code
-        - run:
-            name: Test source code
-            command: 
-                export CHROME_BIN='C:/Program Files (x86)/Google/Chrome/Application'
-                npm run test -- --no-watch --no-progress --browsers=ChromeHeadlessCI
-        # End to End Test - invoke protractor to serve the app
-        # ng test --no-watch --no-progress --browsers=ChromeHeadlessCI
-        # ng e2e --protractor -config=e2e/protractor-ci.conf.js
-        - run:
-            name: Run E2E tests
-            command: 
-                export CHROME_BIN='C:/Program Files (x86)/Google/Chrome/Application'
-                sudo npm install -g karma-cli
-                npm run test --code-coverage
-                npm run e2e -- --protractor-config=e2e/protractor-ci.conf.js
+      - checkout
+      - restore_cache:
+          key: frontend-build
+      # Test the source code
+      - run:
+          name: Test source code
+          command: 
+            sudo npm install -g karma-cli
+            npm run test --code-coverage
+      - run:
+          name: Run E2E tests
+          command: 
+            sudo npm install -g karma-cli
+            npm i -D puppeteer karma-chrome-launcher
+            npm run test-headless
+            npm run e2e -- --protractor-config=e2e/protractor-ci.conf.js
+            ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i docker-compose.yml
       # Build project with different configuration based on the current branch
-        - run:
-            name: Build target branch 
-            command: |
-                if [ "${CIRCLE_BRANCH}" == "staging" ]; then
-                  npm run build-qa
-                elif [ "${CIRCLE_BRANCH}" == "main" ]; then
-                  npm run build-prod
-                else
-                  npm run build-dev
-                fi
+      - run:
+          name: Build target branch 
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "staging" ]; then
+              npm run build-qa
+            elif [ "${CIRCLE_BRANCH}" == "main" ]; then
+              npm run build-prod
+            else
+              npm run build-dev
+            fi
       # Cache the dist folder for the deploy job
-        - save_cache:
-            key: v1-dist-{{ .Environment.CIRCLE_BRANCH }}-{{ .Environment.CIRCLE_SHA1 }}
-            paths:
-              - dist
-        - destroy-environment:
-            workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      - save_cache:
+          key: v1-dist-{{ .Environment.CIRCLE_BRANCH }}-{{ .Environment.CIRCLE_SHA1 }}
+          paths:
+            - dist
+      - destroy-environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+
+  # Scan for known vulnerabilities
+  scan-app:
+    docker:
+      - image: circleci/node:16.13.0
+    steps:
+      - checkout
+      - run:
+          name: Scan application files
+          command: npm install
 
   build-container: # https://dzone.com/articles/how-to-dockerize-angular-app
     machine: true
     steps:
-        - checkout
-        - run:
-            name: Build docker container
-            command: |
-                docker login --username ${DOCKER_LOGIN} --password ${Docker_PWD}
-                docker build -t cicloud-app:latest . 
-                docker images ls
-                docker tag cicloud-app ${DOCKER_LOGIN}/cicloud-app:latest
-                docker push ${DOCKER_LOGIN}/cicloud-app:latest
-        - destroy-environment:
-            workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      - checkout
+      - run:
+          name: Build docker container
+          command: |
+              docker login --username ${DOCKER_LOGIN} --password ${Docker_PWD}
+              docker build -t cicloud-app:latest . 
+              docker images ls
+              docker tag cicloud-app ${DOCKER_LOGIN}/cicloud-app:latest
+              docker push ${DOCKER_LOGIN}/cicloud-app:latest
+      - destroy-environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
   # Now, we deploy our angular app
   deploy-app:
     docker:
-        - image: amazon/aws-cli
+      - image: amazon/aws-cli
     steps:
-        - checkout
-        - run:
-            name: Install dependencies
-            command: |
-                yum -y install tar 
-                yum -y install gzip
-                curl -sL https://rpm.nodesource.com/setup_lts.x | bash -
-                yum -y install nodejs
-        - attach_workspace:
-            at: ./
-        - run:
-            name: Deploy frontend objects
-            command: |
-                cd dist/DemoApp
-                npm install
-                npm run build
-                tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
-                aws s3 cp dist s3://cicloud-${CIRCLE_WORKFLOW_ID:0:7} --recursive
-        - destroy-environment:
-            workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+              yum -y install tar 
+              yum -y install gzip
+              curl -sL https://rpm.nodesource.com/setup_lts.x | bash -
+              yum -y install nodejs
+      - attach_workspace:
+          at: ./
+      - run:
+          name: Deploy frontend objects
+          command: |
+              cd dist/DemoApp
+              npm install
+              npm run build
+              tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
+              aws s3 cp dist s3://cicloud-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+      - destroy-environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
   # deploy-app:
   #     docker:
@@ -236,15 +244,16 @@ jobs:
 workflows:
     default:
       jobs:
-        - build-frontend
-        - lint-frontend:
-            requires: [build-frontend]
+        - build-app
+        - scan-app
+        - lint-app:
+            requires: [build-app]
         - lint-docker:
-            requires: [lint-frontend, build-frontend]
+            requires: [lint-app, build-app]
         - test-app:
-            requires: [lint-frontend]
+            requires: [lint-app]
         - build-container:
-            requires: [test-app, lint-frontend, lint-docker]
+            requires: [test-app, lint-app, lint-docker]
             filters:
               branches:
                 only: [master]
