@@ -130,7 +130,7 @@ jobs:
             npm i -D puppeteer karma-chrome-launcher
             npm run test-headless
             npm run e2e -- --protractor-config=e2e/protractor-ci.conf.js
-            ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i docker-compose.yml
+            ansible-playbook -i docker-compose.yml
       # Build project with different configuration based on the current branch
       - run:
           name: Build target branch 
