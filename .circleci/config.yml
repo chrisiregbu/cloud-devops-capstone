@@ -137,10 +137,14 @@ jobs:
           name: Run E2E tests
           command:  npm run
 
-  build-container: # https://dzone.com/articles/how-to-dockerize-angular-app
+  build-and-push-image: # https://dzone.com/articles/how-to-dockerize-angular-app
     machine: true
     steps:
       - checkout
+      - run:
+          name: Create ECR Repository
+          command:
+            aws ecr create-repository --repository-name ciangularapp --image-scanning-configuration scanOnPush=true
       - run:
           name: Build docker container
           command: |
@@ -177,7 +181,7 @@ jobs:
               docker build -t 471776097205.dkr.ecr.eu-west-2.amazonaws.com/ciangularapp:latest .
 
               echo "Step 3: Tagging the image so that it can be pushed to the repository..."
-              docker tag ciangularapp:latest 471776097205.dkr.ecr.eu-west-2.amazonaws.com/ciangularapp:latest
+              #docker tag ciangularapp:latest 471776097205.dkr.ecr.eu-west-2.amazonaws.com/ciangularapp:latest
 
               echo "Step 4: Pushing the image the newly created Amazon repository..."              
               docker push 471776097205.dkr.ecr.eu-west-2.amazonaws.com/ciangularapp:latest
@@ -197,19 +201,19 @@ workflows:
             requires: [lint-app, build-app]
         - test-app:
             requires: [build-app]
-        - build-container:
+        - build-and-push-image:
             requires: [test-app, lint-app, lint-docker]
             filters:
               branches:
                 only: [main]
         # The deploy job will only run on the filtered branches and
         # require the build job to be successful before it starts
-        - deploy-app:
-            requires: [build-container]
-            filters:
-              branches:
-                only:
-                  - develop
-                  - staging
-                  - main
-                  - master
+        # - deploy-app:
+        #     requires: [build-container]
+        #     filters:
+        #       branches:
+        #         only:
+        #           - develop
+        #           - staging
+        #           - main
+        #           - master
