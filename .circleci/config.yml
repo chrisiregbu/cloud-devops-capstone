@@ -137,16 +137,18 @@ jobs:
           name: Run E2E tests
           command:  npm run
 
-  build-and-push-image: # https://dzone.com/articles/how-to-dockerize-angular-app
+  build-and-push-image: 
     machine: true
     steps:
       - checkout
       - run:
-          name: Create ECR Repository
+          name: Create repository in AWS ECR
           command:
-            aws ecr create-repository --repository-name cidevops
+            aws ecr describe-repositories \
+              --repository-names ${REPO_NAME} || aws ecr create-repository \
+              --repository-name ${REPO_NAME}
       - run:
-          name: Build docker container
+          name: Build docker container  # https://dzone.com/articles/how-to-dockerize-angular-app
           command: |
             docker login --username ${DOCKER_LOGIN} --password ${Docker_PWD}
             docker build -t ciangularapp:latest . 
