@@ -146,9 +146,12 @@ jobs:
           command:
             output=$(aws ecr describe-repositories --repository-names ${REPO_NAME} 2>&1)
 
-            if echo ${output} | grep -q
+            if [ $? -ne 0 ]
             then
-              aws ecr create-repository --region ${AWS_DEFAULT_REGION} --repository-name ${REPO_NAME}
+              if echo ${output} | grep -q RepositoryNotFoundException
+              then
+                aws ecr create-repository --region ${AWS_DEFAULT_REGION} --repository-name ${REPO_NAME}
+              fi
             fi
             #aws ecr create-repository --region ${AWS_DEFAULT_REGION} --repository-name ${REPO_NAME}
       - run:
