@@ -144,8 +144,14 @@ jobs:
       - run:
           name: Create repository
           command:
-            aws ecr describe-repositories --region ${AWS_DEFAULT_REGION} --repository-names > /dev/null 2>&1 || \
-            aws ecr create-repository --region ${AWS_DEFAULT_REGION} --repository-name ${REPO_NAME}
+            #export output=$(aws ecr describe-repositories --repository-names ${REPO_NAME} 2>&1)
+            output=$(aws ecr describe-repositories --query 'repositories[?repositoryName==` ${REPO_NAME}`].repositoryName')
+
+            if [ $? -ne 0 ]; then
+              if echo ${output} | grep -q RepositoryNotFoundException; then
+                aws ecr create-repository --region ${AWS_DEFAULT_REGION} --repository-name ${REPO_NAME}
+              fi
+            fi
             #aws ecr create-repository --region ${AWS_DEFAULT_REGION} --repository-name ${REPO_NAME}
       - run:
           name: Build docker container  # https://dzone.com/articles/how-to-dockerize-angular-app
