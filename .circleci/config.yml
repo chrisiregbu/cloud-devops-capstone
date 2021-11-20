@@ -147,10 +147,9 @@ jobs:
             export output=$(aws ecr describe-repositories --query 'repositories[?repositoryName==`ciangularapp`].repositoryName')
 
             if [ $? -ne 0 ]; then
-              if echo ${output} | grep "RepositoryNotFoundException"
-              then
+              if echo ${output} | grep "RepositoryNotFoundException"; then
                 aws ecr create-repository --region ${AWS_DEFAULT_REGION} --repository-name ${REPO_NAME}
-              elif
+              else
                 echo "Repository already"
               fi
             fi
