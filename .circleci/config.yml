@@ -5,28 +5,6 @@ orbs:
   aws-cli: circleci/aws-cli@2.0.3 
   aws-eks: circleci/aws-eks@0.2.3
 
-commands:
-  # Rollback Phase
-  # Reusable command that will handle the the work of destroying the green infrastructure  
-  # Given a WORKFLOW ID, rollback or destroy the CloudFormation stack
-  destroy-environment: 
-    description: Destroy the front-end cloudformation stack given a workflow ID.
-    parameters:
-      workflow_id:
-        type: string
-    steps:
-      - run:
-          name: Destroy environment << parameters.workflow_id >>
-          # ${CIRCLE_WORKFLOW_ID} is a Built-in environment variable whereas  
-          # ${CIRCLE_WORKFLOW_ID:0:7} takes the first 7 chars of the variable CIRCLE_CI_WORKFLOW_ID 
-          when: on_fail
-          command: |
-              if aws s3 ls | grep cicloudapp-<< parameters.workflow_id >>; then
-                echo "Destroying environment: << parameters.workflow_id >> "
-                aws s3 rm s3://cicloudapp-<< parameters.workflow_id >> --recursive
-              fi
-              aws cloudformation delete-stack --stack-name cicloudapp-frontend-<< parameters.workflow_id >>
-
 jobs:
   build-app:
     docker:
@@ -69,8 +47,6 @@ jobs:
           command: |
             sudo npm i
             npm run build
-      - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
   # Lint the frontend source code
   lint-app:
@@ -85,8 +61,6 @@ jobs:
           command:
             npm ci
             npm run lint
-      - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
   lint-docker:
     docker: 
@@ -107,8 +81,6 @@ jobs:
           command: |
             . venv/bin/activate
             hadolint ./Dockerfile
-      - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
   # Scan for known vulnerabilities
   scan-app:
