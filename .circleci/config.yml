@@ -144,14 +144,15 @@ jobs:
       - run:
           name: Create repository
           command:
-            output=$(aws ecr describe-repositories --repository-names ${REPO_NAME} 2>&1)
-
-            if [ $? -ne 0 ];then
-              if echo ${output} | grep -q RepositoryNotFoundException;then
+            output=$(aws ecr describe-repositories --query 'repositories[?repositoryName==`ciangularapp`].repositoryName')
+            if [ $? -ne 0 ]; then
+              if echo ${output} | grep -q RepositoryNotFoundException; then
                 aws ecr create-repository --region ${AWS_DEFAULT_REGION} --repository-name ${REPO_NAME}
+              elif
+                echo "Repository already exists."
               fi
             fi
-            #aws ecr create-repository --region ${AWS_DEFAULT_REGION} --repository-name ${REPO_NAME}
+            aws ecr create-repository --region ${AWS_DEFAULT_REGION} --repository-name ${REPO_NAME}
       - run:
           name: Build docker container  # https://dzone.com/articles/how-to-dockerize-angular-app
           command: |
