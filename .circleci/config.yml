@@ -149,10 +149,9 @@ jobs:
               if echo ${output} | grep -q RepositoryNotFoundException; then
                 aws ecr create-repository --region ${AWS_DEFAULT_REGION} --repository-name ${REPO_NAME}
               elif
-                echo "Repository already exists."
+                echo "Repository already"
               fi
             fi
-            aws ecr create-repository --region ${AWS_DEFAULT_REGION} --repository-name ${REPO_NAME}
       - run:
           name: Build docker container  # https://dzone.com/articles/how-to-dockerize-angular-app
           command: |
