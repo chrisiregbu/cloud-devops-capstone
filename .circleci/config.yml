@@ -144,9 +144,7 @@ jobs:
       - run:
           name: Create repository in AWS ECR
           command:
-            aws ecr describe-repositories \
-              --repository-names ${REPO_NAME} || aws ecr create-repository \
-              --repository-name ${REPO_NAME}
+              aws ecr create-repository --region ${AWS_DEFAULT-REGION} --repository-name ${REPO_NAME}
       - run:
           name: Build docker container  # https://dzone.com/articles/how-to-dockerize-angular-app
           command: |
