@@ -144,7 +144,7 @@ jobs:
       - run:
           name: Create ECR Repository
           command:
-            aws ecr create-repository --repository-name ciangularapp --image-scanning-configuration scanOnPush=true
+            aws ecr create-repository --repository-name cidevops
       - run:
           name: Build docker container
           command: |
