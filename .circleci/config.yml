@@ -144,13 +144,7 @@ jobs:
       - run:
           name: Create repository
           command:
-            export output=$(aws ecr describe-repositories --query 'repositories[?repositoryName==`ciangularapp`].repositoryName')
-
-            if [ $? -ne 0 ]; then
-              if [echo ${output} | grep RepositoryNotFoundException]; then
-                aws ecr create-repository --region ${AWS_DEFAULT_REGION} --repository-name ${REPO_NAME}
-              fi
-            fi
+            aws ecr create-repository --region ${AWS_DEFAULT_REGION} --repository-name ${REPO_NAME}
       - run:
           name: Build docker container  # https://dzone.com/articles/how-to-dockerize-angular-app
           command: |
