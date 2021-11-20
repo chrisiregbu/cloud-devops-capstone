@@ -146,7 +146,8 @@ jobs:
           command:
             output=$(aws ecr describe-repositories --repository-names ${REPO_NAME} 2>&1)
 
-            if echo ${output} | grep -q; then
+            if echo ${output} | grep -q
+            then
               aws ecr create-repository --region ${AWS_DEFAULT_REGION} --repository-name ${REPO_NAME}
             fi
             #aws ecr create-repository --region ${AWS_DEFAULT_REGION} --repository-name ${REPO_NAME}
