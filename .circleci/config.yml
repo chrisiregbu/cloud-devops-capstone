@@ -124,7 +124,7 @@ jobs:
             docker build -t angularapp:local . 
             docker images ls
             #docker run -t -i -p 8000:3000 angularapp:local
-            #docker run -it angularapp:local bash
+            docker run -it angularapp:local bash
             #docker tag angularapp ${DOCKER_LOGIN}/angularapp:latest
             #docker push ${DOCKER_LOGIN}/angularapp:latest
 
