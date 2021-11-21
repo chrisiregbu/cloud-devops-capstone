@@ -153,7 +153,6 @@ jobs:
           command:
             COMMIT=$(git rev-parse --verify HEAD)
             docker build -t angularapp:latest .
-            docker build -t angularapp:${COMMIT} .
             docker images ls
             docker run -t angularapp
 
