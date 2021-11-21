@@ -151,6 +151,9 @@ jobs:
               python3 -m venv venv
               . venv/bin/activate
 
+              sudo chmod 666 /var/run/docker.sock
+              sudo usermod -aG docker ${USER}
+
               echo "Authenticating Docker client to AWS ECR registry..."
               aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin 471776097205.dkr.ecr.eu-west-2.amazonaws.com
 
