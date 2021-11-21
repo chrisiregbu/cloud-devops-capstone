@@ -156,8 +156,8 @@ jobs:
               echo "Building the container..."
               docker build -t 471776097205.dkr.ecr.eu-west-2.amazonaws.com/${REPO_NAME}:latest .
 
-              echo "Tagging the image so that it can be pushed to the repository..."
-              docker tag ${REPO_NAME}:latest 471776097205.dkr.ecr.eu-west-2.amazonaws.com/${REPO_NAME}:latest
+              #echo "Tagging the image so that it can be pushed to the repository..."
+              #docker tag ${REPO_NAME}:latest 471776097205.dkr.ecr.eu-west-2.amazonaws.com/${REPO_NAME}:latest
 
               echo "Pushing the image the newly created Amazon repository..."           
               docker push 471776097205.dkr.ecr.eu-west-2.amazonaws.com/${REPO_NAME}:latest
