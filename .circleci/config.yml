@@ -151,9 +151,10 @@ jobs:
       - run:
           name: Run Docker
           command:
-            docker build -t angularapplocal .
+            echo COMMIT=$(git rev-parse --verify HEAD)
+            docker build -t angularapp:$COMMIT .
             docker images ls
-            docker run -t angularapplocal
+            docker run -t angularapp
 
   # Deploy the angular app
   deploy-app:
