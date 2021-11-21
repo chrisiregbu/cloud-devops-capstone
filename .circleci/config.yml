@@ -151,13 +151,14 @@ jobs:
               echo "Authenticating Docker client to AWS ECR registry..."
               aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin 471776097205.dkr.ecr.eu-west-2.amazonaws.com
 
-              echo "Building the container locally..."
-              docker build -t 471776097205.dkr.ecr.eu-west-2.amazonaws.com/${REPO_NAME} .
+              echo "Building the container..."
+              docker build -t ${REPO_NAME} .
+              #docker build -t 471776097205.dkr.ecr.eu-west-2.amazonaws.com/${REPO_NAME} .
 
               echo "Tagging the image so that it can be pushed to the repository..."
               docker tag ${REPO_NAME}:latest 471776097205.dkr.ecr.eu-west-2.amazonaws.com/${REPO_NAME}:latest
 
-              echo "Pushing the image the newly created Amazon repository..."              
+              echo "Pushing the image the newly created Amazon repository..."           
               docker push 471776097205.dkr.ecr.eu-west-2.amazonaws.com/${REPO_NAME}:latest
 
               echo "Docker image upload completed!"
