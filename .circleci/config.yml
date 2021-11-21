@@ -121,10 +121,10 @@ jobs:
           name: Build docker container  # https://dzone.com/articles/how-to-dockerize-angular-app
           command: |
             docker login --username ${DOCKER_LOGIN} --password ${Docker_PWD}
-            docker build -t angularapp:1.0 . 
+            docker build -t angularapp:latest . 
             docker images ls
-            docker tag angularapp ${DOCKER_LOGIN}/angularapp:1.0
-            docker push ${DOCKER_LOGIN}/angularapp:1.0
+            docker tag angularapp ${DOCKER_LOGIN}/angularapp:latest
+            docker push ${DOCKER_LOGIN}/angularapp:latest
 
   # Deploy the angular app
   deploy-app:
@@ -150,13 +150,13 @@ jobs:
               aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin 471776097205.dkr.ecr.eu-west-2.amazonaws.com
 
               echo "Building the container locally..."
-              docker build -t 471776097205.dkr.ecr.eu-west-2.amazonaws.com/angularapp1.0 .
+              docker build -t 471776097205.dkr.ecr.eu-west-2.amazonaws.com/angularapp:latest .
 
               echo "Tagging the image so that it can be pushed to the repository..."
-              docker tag angularapp:1.0 471776097205.dkr.ecr.eu-west-2.amazonaws.com/angularapp:1.0
+              docker tag angularapp:latest 471776097205.dkr.ecr.eu-west-2.amazonaws.com/angularapp:latest
 
               echo "Pushing the image the newly created Amazon repository..."              
-              docker push 471776097205.dkr.ecr.eu-west-2.amazonaws.com/angularapp:1.0
+              docker push 471776097205.dkr.ecr.eu-west-2.amazonaws.com/angularapp:latest
 
               echo "Docker image upload completed!"
 workflows:
