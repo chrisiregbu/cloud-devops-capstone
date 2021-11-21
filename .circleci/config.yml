@@ -148,6 +148,9 @@ jobs:
         - run:
             name: Deploy Docker Container Image to Amazon ECR
             command: |
+              python3 -m venv venv
+              . venv/bin/activate
+
               echo "Authenticating Docker client to AWS ECR registry..."
               aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin 471776097205.dkr.ecr.eu-west-2.amazonaws.com
 
