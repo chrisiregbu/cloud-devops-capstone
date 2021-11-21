@@ -188,10 +188,10 @@ jobs:
 
               echo "Building the container..."
               echo COMMIT=$(git rev-parse --verify HEAD)
-              docker build -t 471776097205.dkr.ecr.eu-west-2.amazonaws.com/${REPO_NAME}:$COMMIT .
+              docker build -t 471776097205.dkr.ecr.eu-west-2.amazonaws.com/${REPO_NAME}:v1 .
 
               echo "Pushing the image the newly created Amazon repository..."           
-              docker push 471776097205.dkr.ecr.eu-west-2.amazonaws.com/${REPO_NAME}:$COMMIT
+              docker push 471776097205.dkr.ecr.eu-west-2.amazonaws.com/${REPO_NAME}:v1
 
               echo "Docker image upload completed!"
 
