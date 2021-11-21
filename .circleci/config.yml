@@ -151,11 +151,12 @@ jobs:
       - run:
           name: Build image and push to docker # https://dzone.com/articles/how-to-dockerize-angular-app
           command:
-            COMMIT=$(git rev-parse --verify HEAD)
+            docker login --username ${DOCKER_LOGIN} --password ${Docker_PWD}
             docker build -t angularapp:latest .
             docker images ls
-            docker run angularapp:latest
-
+            docker tag angularapp ${DOCKER_LOGIN}/angularapp:latest
+            docker push ${DOCKER_LOGIN}/angularapp:latest
+            
   # Deploy the angular app
   deploy-app:
       docker:
