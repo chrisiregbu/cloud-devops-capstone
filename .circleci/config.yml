@@ -178,11 +178,10 @@ workflows:
             filters:
               branches:
                 only: [master]
-        # The deploy job will only run on the filtered branches and
-        # require the build job to be successful before it starts
-        # - deploy-app:
-        #     requires: [build-and-push-image]
-        #     filters:
-        #       branches:
-        #         only:
-        #           - master
+        # The deploy job will only run on the filtered branches and require the build job to be successful before it starts
+        - deploy-app:
+            requires: [build-and-push-image]
+            filters:
+              branches:
+                only:
+                  - master
