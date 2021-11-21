@@ -147,8 +147,9 @@ jobs:
         - run:
             name: Deploy Docker Container Image to Amazon ECR
             command: |
-              sudo chmod 666 /var/run/docker.sock
-              sudo usermod -aG docker ${USER}
+              #sudo chmod 666 /var/run/docker.sock
+              #sudo usermod -aG docker ${USER}
+              docker login --username ${DOCKER_LOGIN} --password ${Docker_PWD}
 
               echo "Authenticating Docker client to AWS ECR registry..."
               aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin 471776097205.dkr.ecr.eu-west-2.amazonaws.com
