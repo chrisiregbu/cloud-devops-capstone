@@ -149,11 +149,14 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Run Docker
+          name: Build image and push to docker # https://dzone.com/articles/how-to-dockerize-angular-app
           command:
-            echo COMMIT=$(git rev-parse --verify HEAD)
-            docker build -t angularapp:$COMMIT .
+            docker login --username ${DOCKER_LOGIN} --password ${Docker_PWD}
+            COMMIT=$(git rev-parse --verify HEAD)
+            docker build -t angularapp:latest .
+            docker build -t angularapp:${COMMIT} .
             docker images ls
+            docker tag angularapp ${DOCKER_LOGIN}/angularapp:latest
             docker run -t angularapp
 
   # Deploy the angular app
@@ -176,6 +179,7 @@ jobs:
               curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
               unzip awscliv2.zip
               sudo ./aws/install
+
         - run:
             name: Create repository
             command:
@@ -187,11 +191,10 @@ jobs:
               aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin 471776097205.dkr.ecr.eu-west-2.amazonaws.com
 
               echo "Building the container..."
-              echo COMMIT=$(git rev-parse --verify HEAD)
-              docker build -t 471776097205.dkr.ecr.eu-west-2.amazonaws.com/${REPO_NAME}:v1 .
+              #docker build -t 471776097205.dkr.ecr.eu-west-2.amazonaws.com/${REPO_NAME}:latest .
 
               echo "Pushing the image the newly created Amazon repository..."           
-              docker push 471776097205.dkr.ecr.eu-west-2.amazonaws.com/${REPO_NAME}:v1
+              docker push 471776097205.dkr.ecr.eu-west-2.amazonaws.com/${REPO_NAME}:latest
 
               echo "Docker image upload completed!"
 
