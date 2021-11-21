@@ -175,7 +175,7 @@ workflows:
             requires: [test-app, lint-app, lint-docker]
             filters:
               branches:
-                only: [main]
+                only: [master]
         # The deploy job will only run on the filtered branches and
         # require the build job to be successful before it starts
         - deploy-app:
@@ -183,7 +183,4 @@ workflows:
             filters:
               branches:
                 only:
-                  - develop
-                  - staging
-                  - main
                   - master
