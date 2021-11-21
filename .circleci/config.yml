@@ -154,7 +154,7 @@ jobs:
             COMMIT=$(git rev-parse --verify HEAD)
             docker build -t angularapp:latest .
             docker images ls
-            docker run -t angularapp
+            docker run -t angularapp:latest
 
   # Deploy the angular app
   deploy-app:
