@@ -153,7 +153,7 @@ jobs:
           command:
             docker build -t angularapplocal .
             docker images ls
-            docker run -t -i angularapplocal
+            docker run -t angularapplocal
 
   # Deploy the angular app
   deploy-app:
