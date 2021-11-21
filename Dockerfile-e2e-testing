@@ -2,6 +2,8 @@ FROM node:16-alpine3.13
 
 WORKDIR /opt/usr
 
+RUN npm install 
+
 RUN apt-get update && \
     DEBIAN_FRONTEND="nointeractive" \
     apt-get install -y --no-install-recommends \

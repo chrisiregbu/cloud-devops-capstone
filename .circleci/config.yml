@@ -107,7 +107,7 @@ jobs:
             npm run test --code-coverage
       - run:
           name: Run E2E tests
-          command:  npm run
+          command: npm run
 
   build-and-push-image: 
     machine: true
@@ -121,10 +121,10 @@ jobs:
           name: Build docker container  # https://dzone.com/articles/how-to-dockerize-angular-app
           command: |
             docker login --username ${DOCKER_LOGIN} --password ${Docker_PWD}
-            docker build -t ciangularapp:latest . 
+            docker build -t ${REPO_NAME}:1.0 . 
             docker images ls
-            docker tag ciangularapp ${DOCKER_LOGIN}/ciangularapp:latest
-            docker push ${DOCKER_LOGIN}/ciangularapp:latest
+            docker tag ${REPO_NAME} ${DOCKER_LOGIN}/${REPO_NAME}:1.0
+            docker push ${DOCKER_LOGIN}/${REPO_NAME}:1.0
 
   # Deploy the angular app
   deploy-app:
@@ -146,19 +146,17 @@ jobs:
         - run:
             name: Deploy Docker Container Image to Amazon ECR
             command: |
-              echo "Step 1: Authenticating Docker client to AWS ECR registry..."
+              echo "Authenticating Docker client to AWS ECR registry..."
               aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin 471776097205.dkr.ecr.eu-west-2.amazonaws.com
 
-              echo "Step 2: Building the container locally..."
-              docker build -t 471776097205.dkr.ecr.eu-west-2.amazonaws.com/ciangularapp:latest .
+              echo "Building the container locally..."
+              docker build -t 471776097205.dkr.ecr.eu-west-2.amazonaws.com/${REPO_NAME}:1.0 .
 
-              echo "Step 3: Tagging the image so that it can be pushed to the repository..."
-              #docker tag ciangularapp:latest 471776097205.dkr.ecr.eu-west-2.amazonaws.com/ciangularapp:latest
+              echo "Tagging the image so that it can be pushed to the repository..."
+              docker tag ${REPO_NAME}:1.0 471776097205.dkr.ecr.eu-west-2.amazonaws.com/${REPO_NAME}:1.0
 
-              echo "Step 4: Pushing the image the newly created Amazon repository..."              
-              docker push 471776097205.dkr.ecr.eu-west-2.amazonaws.com/ciangularapp:latest
-
-              aws ecs update-service --cluster ciangularapp-cluster --service angular-svc --force-new-deployment --no-cli-pager
+              echo "Pushing the image the newly created Amazon repository..."              
+              docker push 471776097205.dkr.ecr.eu-west-2.amazonaws.com/${REPO_NAME}:1.0
 
               echo "Docker image upload completed!"
 workflows:
@@ -180,12 +178,12 @@ workflows:
                 only: [main]
         # The deploy job will only run on the filtered branches and
         # require the build job to be successful before it starts
-        # - deploy-app:
-        #     requires: [build-container]
-        #     filters:
-        #       branches:
-        #         only:
-        #           - develop
-        #           - staging
-        #           - main
-        #           - master
+        - deploy-app:
+            requires: [build-container]
+            filters:
+              branches:
+                only:
+                  - develop
+                  - staging
+                  - main
+                  - master

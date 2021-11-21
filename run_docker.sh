@@ -12,4 +12,4 @@ docker images ls
 
 # Step 3: 
 # Run flask app
-docker run -t -i -p 8000:3000 ciangularapp:latest
+docker run -t -i -p 8000:3000 cicloud-app:latest
