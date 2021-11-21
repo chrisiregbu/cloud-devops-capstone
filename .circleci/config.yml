@@ -109,54 +109,19 @@ jobs:
           name: Run E2E tests
           command: npm run
 
-  # build-image: 
-  #   machine: true
-  #   steps:
-  #     - checkout
-  #     - run:
-  #         name: Create repository
-  #         command:
-  #           aws ecr create-repository --region ${AWS_DEFAULT_REGION} --repository-name ${REPO_NAME}
-  #     - run:
-  #         name: Build image and push to docker # https://dzone.com/articles/how-to-dockerize-angular-app
-  #         command: |
-  #           docker login --username ${DOCKER_LOGIN} --password ${Docker_PWD}
-  #           docker build -t angularapp:latest . 
-  #           docker images ls
-  #           docker tag angularapp ${DOCKER_LOGIN}/angularapp:latest
-  #           docker push ${DOCKER_LOGIN}/angularapp:latest
-
-  # build-image: 
-  #   machine: true
-  #   steps:
-  #     - checkout
-
-  #     - run:
-  #         name: Create repository
-  #         command:
-  #           aws ecr create-repository --region ${AWS_DEFAULT_REGION} --repository-name ${REPO_NAME}
-  #     - run:
-  #         name: Build image and push to docker # https://dzone.com/articles/how-to-dockerize-angular-app
-  #         command: |
-  #           docker login --username ${DOCKER_LOGIN} --password ${Docker_PWD}
-  #           docker build -t angularapp:latest . 
-  #           docker images ls
-  #           docker tag angularapp ${DOCKER_LOGIN}/angularapp:latest
-  #           docker push ${DOCKER_LOGIN}/angularapp:latest
-
   build-image:
     machine: true
     steps:
       - checkout
       - run:
-          name: Build image and push to docker # https://dzone.com/articles/how-to-dockerize-angular-app
+          name: Push image to docker # https://dzone.com/articles/how-to-dockerize-angular-app
           command:
             docker login --username ${DOCKER_LOGIN} --password ${Docker_PWD}
-            docker build -t angularapp:latest .
+            docker build -t ${REPO_NAME}:latest .
             docker images ls
-            docker tag angularapp ${DOCKER_LOGIN}/angularapp:latest
-            docker push ${DOCKER_LOGIN}/angularapp:latest
-            
+            docker tag ${REPO_NAME} ${DOCKER_LOGIN}/${REPO_NAME}:latest
+            docker push ${DOCKER_LOGIN}/${REPO_NAME}:latest
+
   # Deploy the angular app
   deploy-app:
       docker:
