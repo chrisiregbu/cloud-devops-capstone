@@ -109,7 +109,7 @@ jobs:
           name: Run E2E tests
           command: npm run
 
-  build-and-push-image: 
+  build-image: 
     machine: true
     steps:
       - checkout
@@ -118,14 +118,14 @@ jobs:
           command:
             aws ecr create-repository --region ${AWS_DEFAULT_REGION} --repository-name ${REPO_NAME}
       - run:
-          name: Build docker container  # https://dzone.com/articles/how-to-dockerize-angular-app
+          name: Build image and push to docker # https://dzone.com/articles/how-to-dockerize-angular-app
           command: |
             docker login --username ${DOCKER_LOGIN} --password ${Docker_PWD}
             docker build -t angularapp:local . 
             docker images ls
-            docker run -t -i -p 8000:3000 angularapp:local
-            #docker tag angularapp ${DOCKER_LOGIN}/angularapp:latest
-            #docker push ${DOCKER_LOGIN}/angularapp:latest
+            docker run -it angularapp:local
+            docker tag angularapp ${DOCKER_LOGIN}/angularapp:local
+            docker push ${DOCKER_LOGIN}/angularapp:local
 
   # Deploy the angular app
   deploy-app:
@@ -173,14 +173,14 @@ workflows:
             requires: [lint-app, build-app]
         - test-app:
             requires: [build-app]
-        - build-and-push-image:
+        - build-image:
             requires: [test-app, lint-app, lint-docker]
             filters:
               branches:
                 only: [master]
         # The deploy job will only run on the filtered branches and require the build job to be successful before it starts
         - deploy-app:
-            requires: [build-and-push-image]
+            requires: [build-image]
             filters:
               branches:
                 only:
