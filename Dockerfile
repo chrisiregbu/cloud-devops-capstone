@@ -19,7 +19,7 @@ COPY src  ./src
 
 RUN npm config set legacy-peer-deps true
 
-RUN npm install 
+RUN npm install; npm run build
 
 COPY . /app
 
@@ -37,5 +37,14 @@ COPY --from=build-step /app/dist/DemoApp /usr/share/nginx/html
 # expose port
 EXPOSE 80
 
+RUN apt-get update && \
+    DEBIAN_FRONTEND="nointeractive" \
+    apt-get install -y --no-install-recommends \
+    chromium=86.0.4240.111-r0 \
+    libgconf-2-4 \
+    openjdk-8-jre-headless \
+    && rm -rf /var/lib/apt/lists/*
+
 # Run Nginx
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["nginx", "-g", "npm", "run", "e2e", "daemon off;"]
+# CMD ["nginx", "-g", "daemon off;"]

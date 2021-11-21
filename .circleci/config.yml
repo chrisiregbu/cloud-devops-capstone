@@ -109,23 +109,54 @@ jobs:
           name: Run E2E tests
           command: npm run
 
-  build-image: 
+  # build-image: 
+  #   machine: true
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: Create repository
+  #         command:
+  #           aws ecr create-repository --region ${AWS_DEFAULT_REGION} --repository-name ${REPO_NAME}
+  #     - run:
+  #         name: Build image and push to docker # https://dzone.com/articles/how-to-dockerize-angular-app
+  #         command: |
+  #           docker login --username ${DOCKER_LOGIN} --password ${Docker_PWD}
+  #           docker build -t angularapp:latest . 
+  #           docker images ls
+  #           docker tag angularapp ${DOCKER_LOGIN}/angularapp:latest
+  #           docker push ${DOCKER_LOGIN}/angularapp:latest
+
+  # build-image: 
+  #   machine: true
+  #   steps:
+  #     - checkout
+
+  #     - run:
+  #         name: Create repository
+  #         command:
+  #           aws ecr create-repository --region ${AWS_DEFAULT_REGION} --repository-name ${REPO_NAME}
+  #     - run:
+  #         name: Build image and push to docker # https://dzone.com/articles/how-to-dockerize-angular-app
+  #         command: |
+  #           docker login --username ${DOCKER_LOGIN} --password ${Docker_PWD}
+  #           docker build -t angularapp:latest . 
+  #           docker images ls
+  #           docker tag angularapp ${DOCKER_LOGIN}/angularapp:latest
+  #           docker push ${DOCKER_LOGIN}/angularapp:latest
+
+  build-image:
     machine: true
     steps:
       - checkout
+      - setup_remote_docker:
+          version: 19.03.13
+          docker_layer_caching: true
       - run:
-          name: Create repository
+          name: Run Docker
           command:
-            aws ecr create-repository --region ${AWS_DEFAULT_REGION} --repository-name ${REPO_NAME}
-      - run:
-          name: Build image and push to docker # https://dzone.com/articles/how-to-dockerize-angular-app
-          command: |
-            docker login --username ${DOCKER_LOGIN} --password ${Docker_PWD}
-            docker build -t angularapp:latest . 
+            docker build -t angularapplocal .
             docker images ls
-            #docker run -it angularapp:latest
-            docker tag angularapp ${DOCKER_LOGIN}/angularapp:latest
-            docker push ${DOCKER_LOGIN}/angularapp:latest
+            docker run -t -i angularapplocal
 
   # Deploy the angular app
   deploy-app:
@@ -146,7 +177,11 @@ jobs:
               sudo apt-get install unzip -y
               curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
               unzip awscliv2.zip
-              sudo ./aws/install  
+              sudo ./aws/install
+        - run:
+            name: Create repository
+            command:
+              aws ecr create-repository --region ${AWS_DEFAULT_REGION} --repository-name ${REPO_NAME}  
         - run:
             name: Deploy Docker Container Image to Amazon ECR
             command: |
@@ -154,13 +189,11 @@ jobs:
               aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin 471776097205.dkr.ecr.eu-west-2.amazonaws.com
 
               echo "Building the container..."
-              docker build -t 471776097205.dkr.ecr.eu-west-2.amazonaws.com/${REPO_NAME}:latest .
-
-              #echo "Tagging the image so that it can be pushed to the repository..."
-              #docker tag ${REPO_NAME}:latest 471776097205.dkr.ecr.eu-west-2.amazonaws.com/${REPO_NAME}:latest
+              echo COMMIT=$(git rev-parse --verify HEAD)
+              docker build -t 471776097205.dkr.ecr.eu-west-2.amazonaws.com/${REPO_NAME}:$COMMIT .
 
               echo "Pushing the image the newly created Amazon repository..."           
-              docker push 471776097205.dkr.ecr.eu-west-2.amazonaws.com/${REPO_NAME}:latest
+              docker push 471776097205.dkr.ecr.eu-west-2.amazonaws.com/${REPO_NAME}:$COMMIT
 
               echo "Docker image upload completed!"
 
