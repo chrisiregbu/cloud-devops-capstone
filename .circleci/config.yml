@@ -159,8 +159,8 @@ jobs:
               docker push 471776097205.dkr.ecr.eu-west-2.amazonaws.com/${REPO_NAME}:latest
 
               echo "Update image in ECS..."
-              aws ecs update-service --cluster angular-cluster --service angular-sv --force-new-deployment --no-cli-pager
-              
+              aws ecs update-service --cluster angular-cluster --service http-service --force-new-deployment --no-cli-pager
+
               echo "Docker image upload completed!"
 
 workflows:

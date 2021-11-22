@@ -12,4 +12,4 @@ echo "Push image"
 docker push 471776097205.dkr.ecr.eu-west-2.amazonaws.com/clouddevops:latest
 
 echo "update image"
-aws ecs update-service --cluster angular-cluster --service angular-sv --force-new-deployment --no-cli-pager
+aws ecs update-service --cluster angular-cluster --service http-service --force-new-deployment --no-cli-pager
