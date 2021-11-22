@@ -114,6 +114,10 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Create repository
+          command:
+            aws ecr create-repository --region ${AWS_DEFAULT_REGION} --repository-name ${REPO_NAME}
+      - run:
           name: Push image to docker # https://dzone.com/articles/how-to-dockerize-angular-app
           command:
             docker login --username ${DOCKER_LOGIN} --password ${Docker_PWD}
@@ -141,11 +145,7 @@ jobs:
               sudo apt-get install unzip -y
               curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
               unzip awscliv2.zip
-              sudo ./aws/install
-        - run:
-            name: Create repository
-            command:
-              aws ecr create-repository --region ${AWS_DEFAULT_REGION} --repository-name ${REPO_NAME}  
+              sudo ./aws/install 
         - run:
             name: Deploy Docker Container Image to Amazon ECR
             command: |
@@ -180,7 +180,3 @@ workflows:
         # The deploy job will only run on the filtered branches and require the build job to be successful before it starts
         - deploy-app:
             requires: [build-image]
-            filters:
-              branches:
-                only:
-                  - master
