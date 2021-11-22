@@ -117,7 +117,6 @@ jobs:
           name: Push image to docker # https://dzone.com/articles/how-to-dockerize-angular-app
           command:
             docker login --username ${DOCKER_LOGIN} --password ${Docker_PWD}
-            docker build -t clouddevops:latest .
             docker images ls
             docker tag clouddevops ${DOCKER_LOGIN}/clouddevops:latest
             docker push ${DOCKER_LOGIN}/clouddevops:latest
@@ -153,7 +152,7 @@ jobs:
               aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin 471776097205.dkr.ecr.eu-west-2.amazonaws.com
 
               echo "Building the container..."
-              #docker build -t 471776097205.dkr.ecr.eu-west-2.amazonaws.com/${REPO_NAME}:latest .
+              docker build -t 471776097205.dkr.ecr.eu-west-2.amazonaws.com/${REPO_NAME}:latest .
 
               echo "Pushing the image the newly created Amazon repository..."           
               docker push 471776097205.dkr.ecr.eu-west-2.amazonaws.com/${REPO_NAME}:latest
