@@ -1,20 +1,15 @@
 #!/bin/sh
 
-echo "Pre-Build Steps:"
-echo "authenticating with AWS ECR..."
+echo "Authenticating with AWS ECR"
 aws ecr get-login-password --region eu-west-2 \
     | docker login --username AWS \
     --password-stdin 471776097205.dkr.ecr.eu-west-2.amazonaws.com
 
-echo "Build Steps:"
-echo "building image..."
-docker build -t 471776097205.dkr.ecr.eu-west-2.amazonaws.com/cloudevops:latest .
+echo "Build image"
+docker build -t 471776097205.dkr.ecr.eu-west-2.amazonaws.com/clouddevops:latest .
 
-echo "Post-Build Steps:"
-echo "pushing image to AWS ECR..."
-docker push 471776097205.dkr.ecr.eu-west-2.amazonaws.com/cloudevops:latest
+echo "Push image"
+docker push 471776097205.dkr.ecr.eu-west-2.amazonaws.com/clouddevops:latest
 
-echo "updating AWS ECS service..."
-aws ecs update-service --cluster cloudevops-cluster --service angular-svc --force-new-deployment --no-cli-pager
-
-echo "Done!"
+2cho "update image"
+aws ecs update-service --cluster clouddevops-cluster --service angular-svc --force-new-deployment --no-cli-pager
