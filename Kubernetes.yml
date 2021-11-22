@@ -1,15 +1,15 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: clouddevops
+  name: frontend
   labels:
-    app: clouddevops
+    app: frontend
   namespace: default
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: clouddevops
+      app: frontend
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -18,12 +18,12 @@ spec:
   template:
     metadata:
       labels:
-        app: clouddevops
+        app: frontend
     spec:
       containers:
-        - image: ciregbu/clouddevops:latest-v1
+        - image: ciregbu/frontend:latest-v1
           imagePullPolicy: Always
-          name: clouddevops
+          name: frontend
           ports:
             - containerPort: 3000
 
@@ -33,11 +33,11 @@ kind: Service
 metadata:
   name: angular-sv
   labels:
-    app: clouddevops
+    app: frontend
 spec:
   type: LoadBalancer
   selector:
-    app: clouddevops
+    app: frontend
   ports:
     - port: 3000
       targetPort: 3000
