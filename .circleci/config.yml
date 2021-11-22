@@ -116,7 +116,7 @@ jobs:
       - run:
           name: Push image to docker # https://dzone.com/articles/how-to-dockerize-angular-app
           command:
-            docker build -t clouddevops .
+            docker build clouddevops .
             docker images ls
             docker run clouddevops
 
