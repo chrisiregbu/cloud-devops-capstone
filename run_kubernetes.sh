@@ -5,11 +5,11 @@
 # Step 1:
 # This is your Docker ID/path
 # dockerpath=<>
-dockerpath=ciregbu/ciangularapp
+dockerpath=ciregbu/clouddevops
 
 # Step 2
 # Run the Docker Hub container with kubernetes
-kubectl run ciangularapp --image=$dockerpath
+kubectl run angularapp --image=$dockerpath
 
 # Step 3:
 # List kubernetes pods
@@ -17,4 +17,4 @@ kubectl get pods
 
 # Step 4:
 # Forward the container port to a host
-kubectl port-forward pod/ciangularapp 8000:80
+kubectl port-forward pod/clouddevops 8000:80
