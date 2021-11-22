@@ -11,7 +11,7 @@ export class DashboardComponent implements OnInit {
   constructor() { }
 
   testTypes: TestType[] = [];
-  testDescription: string = "Nothing Selcted!"
+  testDescription: string = ""
 
   ngOnInit() {
     this.testTypes = testTypes;

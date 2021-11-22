@@ -9,7 +9,7 @@ export class HeaderComponent implements OnInit {
 
   constructor() { }
 
-  title: string = 'Angular e2e Tests In Docker'
+  title: string = 'Angular e2e Tests In Docker V1'
 
   ngOnInit() {
   }

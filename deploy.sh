@@ -11,5 +11,5 @@ docker build -t 471776097205.dkr.ecr.eu-west-2.amazonaws.com/clouddevops:latest 
 echo "Push image"
 docker push 471776097205.dkr.ecr.eu-west-2.amazonaws.com/clouddevops:latest
 
-2cho "update image"
-aws ecs update-service --cluster clouddevops-cluster --service angular-svc --force-new-deployment --no-cli-pager
+echo "update image"
+aws ecs update-service --cluster angular-cluster --service angular-sv --force-new-deployment --no-cli-pager

@@ -5,11 +5,11 @@
 # Step 1:
 # This is your Docker ID/path
 # dockerpath=<>
-dockerpath=ciregbu/ciangularapp
+dockerpath=ciregbu/clouddevops
 
 # Step 2
 # Run the Docker Hub container with kubernetes
-kubectl run ciangularapp --image=$dockerpath
+kubectl run clouddevops --image=$dockerpath
 
 # Step 3:
 # List kubernetes pods

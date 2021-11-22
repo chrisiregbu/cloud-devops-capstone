@@ -12,7 +12,7 @@ spec:
       app: clouddevops
   strategy:
     rollingUpdate:
-      maxSurge: 25%
+      maxSurge: 1
       maxUnavailable: 25%
     type: RollingUpdate
   template:
@@ -21,7 +21,7 @@ spec:
         app: clouddevops
     spec:
       containers:
-        - image: ciregbu/clouddevops:latest
+        - image: ciregbu/clouddevops:latest-v1
           imagePullPolicy: Always
           name: clouddevops
           ports:
@@ -31,7 +31,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: clouddevops
+  name: angular-sv
   labels:
     app: clouddevops
 spec:
