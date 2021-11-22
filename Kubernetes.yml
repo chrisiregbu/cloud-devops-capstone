@@ -1,15 +1,15 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: angularapp-deployment
+  name: clouddevops
   labels:
-    app: angularapp
+    app: clouddevops
   namespace: default
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: angularapp
+      app: clouddevops
   strategy:
     rollingUpdate:
       maxSurge: 25%
@@ -18,12 +18,12 @@ spec:
   template:
     metadata:
       labels:
-        app: angularapp
+        app: clouddevops
     spec:
       containers:
-        - image: ciregbu/angularapp:1.0
+        - image: ciregbu/clouddevops:latest
           imagePullPolicy: Always
-          name: angularapp
+          name: clouddevops
           ports:
             - containerPort: 3000
 
@@ -31,13 +31,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: angularapp
+  name: clouddevops
   labels:
-    app: angularapp
+    app: clouddevops
 spec:
   type: LoadBalancer
   selector:
-    app: angularapp
+    app: clouddevops
   ports:
     - port: 3000
       targetPort: 3000
