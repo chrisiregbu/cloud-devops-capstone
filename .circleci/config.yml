@@ -109,16 +109,19 @@ jobs:
           name: Run E2E tests
           command: npm run
 
-  build-image:
-    machine: true
+  build-and-push-image:
+    docker:
+      - image: circleci/node:16.13.0
     steps:
       - checkout
       - run:
           name: Push image to docker # https://dzone.com/articles/how-to-dockerize-angular-app
           command:
-            docker build clouddevops .
+            docker login --username ${DOCKER_USR} --password ${DOCKER_PSW}
+            docker build -t clouddevops:latest .
             docker images ls
-            docker run clouddevops
+            docker tag clouddevops ${DOCKER_USR}/clouddevops:latest
+            docker push ${DOCKER_USR}/clouddevops:latest
 
   # Deploy the angular app
   deploy-app:
@@ -170,11 +173,11 @@ workflows:
             requires: [lint-app, build-app]
         - test-app:
             requires: [build-app]
-        - build-image:
+        - build-and-push-image:
             requires: [test-app, lint-app, lint-docker]
             filters:
               branches:
                 only: [master]
         # The deploy job will only run on the filtered branches and require the build job to be successful before it starts
         - deploy-app:
-            requires: [build-image]
+            requires: [build-and-push-image]
