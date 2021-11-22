@@ -116,12 +116,9 @@ jobs:
       - run:
           name: Push image to docker # https://dzone.com/articles/how-to-dockerize-angular-app
           command:
-            docker login --username ${DOCKER_LOGIN} --password ${Docker_PWD}
-            docker build -t clouddevops:latest .
+            docker build -t clouddevops .
             docker images ls
-            docker tag clouddevops ${DOCKER_LOGIN}/clouddevops:latest
             docker run clouddevops
-            docker push ${DOCKER_LOGIN}/clouddevops:latest
 
   # Deploy the angular app
   deploy-app:
