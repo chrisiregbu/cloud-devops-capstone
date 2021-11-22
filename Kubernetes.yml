@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: angular-deploy
+  name: angularapp-deployment
   labels:
     app: angularapp
   namespace: default
@@ -21,25 +21,25 @@ spec:
         app: angularapp
     spec:
       containers:
-      - name: angular-pod
-        imagePullPolicy: Always
-        image: ciregbu/devops:1.0
-        ports:
-        - containerPort: 8000
+        - image: ciregbu/angularapp:1.0
+          imagePullPolicy: Always
+          name: angularapp
+          ports:
+            - containerPort: 3000
 
-# ---
-# apiVersion: v1
-# kind: Service
-# metadata:
-#   name: angular-deploy
-#   labels:
-#     app: angularapp
-# spec:
-#   type: LoadBalancer
-#   selector:
-#     app: angularapp
-#   ports:
-#     - port: 8000
-#       targetPort: 8000
-#       nodePort: 8000
-#       protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: angularapp
+  labels:
+    app: angularapp
+spec:
+  type: LoadBalancer
+  selector:
+    app: angularapp
+  ports:
+    - port: 3000
+      targetPort: 3000
+      nodePort: 30000
+      protocol: TCP

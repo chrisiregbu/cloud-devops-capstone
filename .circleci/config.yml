@@ -109,22 +109,23 @@ jobs:
           name: Run E2E tests
           command: npm run
 
-  build-image:
-    docker:
-      - image: circleci/node:16.13.0
+  build-image: 
+    machine: true
     steps:
       - checkout
-      - setup_remote_docker:
-          version: 19.03.13
-          docker_layer_caching: true
       - run:
-          name: Push image to docker # https://dzone.com/articles/how-to-dockerize-angular-app
+          name: Create repository
           command:
+            aws ecr create-repository --region ${AWS_DEFAULT_REGION} --repository-name ${REPO_NAME}
+      - run:
+          name: Build image and push to docker # https://dzone.com/articles/how-to-dockerize-angular-app
+          command: |
             docker login --username ${DOCKER_LOGIN} --password ${Docker_PWD}
-            docker build -t clouddevops:latest .
+            docker build -t angularapp:latest . 
             docker images ls
-            docker run clouddevops
-            docker push ${DOCKER_LOGIN}/clouddevops:latest
+            #docker run -it angularapp:latest
+            docker tag angularapp ${DOCKER_LOGIN}/angularapp:latest
+            docker push ${DOCKER_LOGIN}/angularapp:latest
 
   # Deploy the angular app
   deploy-app:
@@ -145,11 +146,7 @@ jobs:
               sudo apt-get install unzip -y
               curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
               unzip awscliv2.zip
-              sudo ./aws/install
-        - run:
-            name: Create repository
-            command:
-              aws ecr create-repository --region ${AWS_DEFAULT_REGION} --repository-name ${REPO_NAME}  
+              sudo ./aws/install  
         - run:
             name: Deploy Docker Container Image to Amazon ECR
             command: |
@@ -158,6 +155,9 @@ jobs:
 
               echo "Building the container..."
               docker build -t 471776097205.dkr.ecr.eu-west-2.amazonaws.com/${REPO_NAME}:latest .
+
+              #echo "Tagging the image so that it can be pushed to the repository..."
+              #docker tag ${REPO_NAME}:latest 471776097205.dkr.ecr.eu-west-2.amazonaws.com/${REPO_NAME}:latest
 
               echo "Pushing the image the newly created Amazon repository..."           
               docker push 471776097205.dkr.ecr.eu-west-2.amazonaws.com/${REPO_NAME}:latest
@@ -184,3 +184,7 @@ workflows:
         # The deploy job will only run on the filtered branches and require the build job to be successful before it starts
         - deploy-app:
             requires: [build-image]
+            filters:
+              branches:
+                only:
+                  - master

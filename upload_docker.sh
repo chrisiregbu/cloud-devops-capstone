@@ -5,7 +5,7 @@
 
 # Step 1:
 # Create dockerpath
-dockerpath=ciregbu/clouddevops
+dockerpath=ciregbu/angularapp
 
 # Step 2:  
 # Authenticate & tag
@@ -14,5 +14,5 @@ echo "Docker ID and Image: $dockerpath"
 # Step 3:
 # Push image to a docker repository
 docker login -u ciregbu
-docker tag clouddevops $dockerpath:latest
+docker tag angularapp $dockerpath:latest
 docker push $dockerpath:latest
