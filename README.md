@@ -1,6 +1,12 @@
 [![CircleCI](https://circleci.com/gh/chrisiregbu/cloud-devops-capstone/tree/main.svg?style=svg)](https://circleci.com/gh/chrisiregbu/cloud-devops-capstone/tree/main)
 
-# Angular Single Page Application
+# Running Angular e2e Tests In Docker
+
+Original version: https://medium.com/bb-tutorials-and-thoughts/how-to-run-angular-e2e-tests-in-docker-f021c23c78f
+
+My line manager has encouraged me to pursue a career in Cloud DevOps particularly automating of development activities. My department is re-platforming a fronted ASP.NET application to an Angular Single Page Application (SPA) on the AWS platform. Creating this project will give me the hands-on experience I need to confidently talk about Cloud DevOps practices and be able to contribute to the re-platforming project. 
+
+The idea for this application is to demonstrate how end-to-end testing of Angular application might be automated using Docker containers on the AWS platfoprm. I feel that understanding how to automate end-to-end testing of a Angular application would be very beneficial to my team which would enhance my career objectives as a Cloud DevOps Engineer. Currently, our Sprint tests are done manually.
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 10.2.0.
 
