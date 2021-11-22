@@ -158,6 +158,9 @@ jobs:
               echo "Pushing the image the newly created Amazon repository..."           
               docker push 471776097205.dkr.ecr.eu-west-2.amazonaws.com/${REPO_NAME}:latest
 
+              echo "AWS ECS Service: updating image..."
+              aws ecs update-service --cluster angular-cluster --service angular-sv --force-new-deployment --no-cli-pager
+              
               echo "Docker image upload completed!"
 
 workflows:
@@ -180,7 +183,3 @@ workflows:
         # The deploy job will only run on the filtered branches and require the build job to be successful before it starts
         - deploy-app:
             requires: [build-image]
-            filters:
-              branches:
-                only:
-                  - master
