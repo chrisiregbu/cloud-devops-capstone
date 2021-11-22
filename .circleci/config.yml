@@ -158,9 +158,6 @@ jobs:
               echo "Pushing the image the newly created Amazon repository..."           
               docker push 471776097205.dkr.ecr.eu-west-2.amazonaws.com/${REPO_NAME}:latest
 
-              echo "Update image in ECS..."
-              #aws ecs update-service --cluster angular-cluster --service http-service --force-new-deployment --no-cli-pager
-
               echo "Docker image upload completed!"
 
 workflows:
@@ -175,15 +172,15 @@ workflows:
             requires: [lint-app, build-app]
         - test-app:
             requires: [build-app]
-        # - build-image:
-        #     requires: [test-app, lint-app, lint-docker]
-        #     filters:
-        #       branches:
-        #         only: [master]
+        - build-image:
+            requires: [test-app, lint-app, lint-docker]
+            filters:
+              branches:
+                only: [master]
         # The deploy job will only run on the filtered branches and require the build job to be successful before it starts
-        # - deploy-app:
-        #     requires: [build-image]
-        #     filters:
-        #       branches:
-        #         only:
-        #           - master
+        - deploy-app:
+            requires: [build-image]
+            filters:
+              branches:
+                only:
+                  - master
