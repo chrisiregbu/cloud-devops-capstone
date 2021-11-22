@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/chrisiregbu/cloud-devops-capstone/tree/main.svg?style=svg)](https://circleci.com/gh/chrisiregbu/cloud-devops-capstone/tree/main)
+[![CircleCI](https://circleci.com/gh/chrisiregbu/cloud-devops-capstone/tree/master.svg?style=svg)](https://circleci.com/gh/chrisiregbu/cloud-devops-capstone/tree/master)
 
 # Running Angular e2e Tests In Docker
 
